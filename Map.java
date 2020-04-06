@@ -13,6 +13,9 @@ public class Map {
 	int cols = 10;
 	String[] map;
 	
+	int initialDotCount;
+	int currentDotCount;
+	
 	public Map(int rows, int cols) {
 		if (rows < 5 || rows > 30 || cols < 5 || cols > 30) {
 			throw new IllegalArgumentException("Invalid rows or cols.");
@@ -20,6 +23,7 @@ public class Map {
 		this.rows = rows;
 		this.cols = cols;
 		this.map = initMap(rows, cols);
+		this.initialDotCount = countMapDots();
 	}
 	
 	/**
@@ -45,7 +49,36 @@ public class Map {
 		return result;
 	}
 	
-	public static void main(String[] args) {
-		System.out.println("test");
+	/**
+	 * init method here gets called in the init method in Game class. 
+	 * It initiates the display of the map and dots.
+	 */
+	public void init() {
+		
 	}
+	
+	/**
+	 * update method here gets called in the update method in Game class.
+	 * It updates the positions of the dots on the map as well as the count of the remaining dots.
+	 */
+	public void update() {
+		
+	}
+	
+	/**
+	 * render method here gets called in the render method in Game class, which gets 
+	 * executed after update method in every frame.
+	 * It renders the updated map based on the updated data (mainly updated location of dots).
+	 */
+	public void render() {
+		
+	}
+	
+	/**
+	 * Counts the number of dots on the map to be used for calculating score.
+	 */
+	private int countMapDots() {
+		
+	}
+	
 }
