@@ -1,4 +1,5 @@
 import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.Graphics;
 
@@ -50,7 +51,7 @@ public class Game extends BasicGame{
 	 * It renders the updated map, ghosts, and pacman, based on the updated data.
 	 */
 	@Override
-	public void render(GameCOntainer container, Graphics g) {
+	public void render(GameContainer container, Graphics g) {
 		
 	}
 	

@@ -5,6 +5,12 @@
  * method update();
  */
 public class Ghost extends BasicCharacter {
+	
+	public Ghost(int x, int y, Directions dir, String charImageLink) {
+		super(x, y, dir, charImageLink);
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * Implemented from the abstract method in BasicCharacter class,
 	 * update method is called every frame of the game by the governing update method in Game class.
