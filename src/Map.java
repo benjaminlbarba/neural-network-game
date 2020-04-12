@@ -78,7 +78,7 @@ public class Map {
 	 * Counts the number of dots on the map to be used for calculating score.
 	 */
 	private int countMapDots() {
-		
+		return 0;
 	}
 	
 }
