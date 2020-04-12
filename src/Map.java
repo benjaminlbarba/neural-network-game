@@ -1,4 +1,9 @@
+import java.io.Console;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
+
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 /**
  * Map is in charge of the following functionalities: 
@@ -9,44 +14,31 @@ import java.util.Arrays;
  * 
  */
 public class Map {
-	int rows = 10;
-	int cols = 10;
-	String[] map;
+	private int mapDataRowCount;
+	private int mapDataColCount;
 	
-	int initialDotCount;
-	int currentDotCount;
+	private float elementPixelUnit;
+	private float mapOriginX;
+	private float mapOriginY;
 	
-	public Map(int rows, int cols) {
-		if (rows < 5 || rows > 30 || cols < 5 || cols > 30) {
-			throw new IllegalArgumentException("Invalid rows or cols.");
-		}
-		this.rows = rows;
-		this.cols = cols;
-		this.map = initMap(rows, cols);
+	private char[][] mapData;
+	
+	private int initialDotCount;
+	private int currentDotCount;
+	
+	private Image wallElementImage;
+	private Image dotImage;
+	
+	public Map(char[][] mapData, float elementPixelUnit, float mapOriginX, float mapOriginY) {
+		this.mapData = mapData;
+		
+		this.elementPixelUnit = elementPixelUnit;
+		this.mapOriginX = mapOriginX;
+		this.mapOriginY = mapOriginY;
+		
+		this.mapDataRowCount = mapData.length;
+		this.mapDataColCount = mapData[0].length;
 		this.initialDotCount = countMapDots();
-	}
-	
-	/**
-	 * Generate a basic map
-	 * @param rows
-	 * @param cols
-	 * @return String[]
-	 */
-	public String[] initMap(int rows, int cols) {
-		String[] result = new String[rows];
-		// Generate the String for the 1st row and the last row
-		char[] charArr1 = new char[cols];
-		Arrays.fill(charArr1, '#');
-		// Generate the String for rows with label 1 to cols-2
-		char[] charArr2 = new char[cols];
-		Arrays.fill(charArr2, '.');
-		charArr2[0] = '#';
-		charArr2[cols - 1] = '#';
-		// Fill the map with Strings
-		Arrays.fill(result, new String(charArr2));
-		result[0] = new String(charArr1);
-		result[rows - 1] = new String(charArr1);
-		return result;
 	}
 	
 	/**
@@ -54,7 +46,11 @@ public class Map {
 	 * It initiates the display of the map and dots.
 	 */
 	public void init() {
-		
+		try {
+			this.wallElementImage = new Image("images/wallElement.jpg");
+		} catch (SlickException e) {
+			System.out.println("WallElement image cannot be found.");
+		}
 	}
 	
 	/**
@@ -71,7 +67,17 @@ public class Map {
 	 * It renders the updated map based on the updated data (mainly updated location of dots).
 	 */
 	public void render() {
-		
+		for (int r = 0; r < this.mapDataRowCount; r++) {
+			for (int c = 0; c < this.mapDataColCount; c++) {
+				char elementSymbol = mapData[r][c];
+				// wall
+				if (elementSymbol == '#') {
+					float x = getElementX(c);
+					float y = getElementY(r);
+					this.wallElementImage.draw(x, y, elementPixelUnit, elementPixelUnit);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -81,4 +87,11 @@ public class Map {
 		return 0;
 	}
 	
+	private float getElementX(int columnNumber) {
+		return this.elementPixelUnit * columnNumber + this.mapOriginX;
+	}
+	
+	private float getElementY(int rowNumber) {
+		return this.elementPixelUnit * rowNumber + this.mapOriginY;
+	}
 }
