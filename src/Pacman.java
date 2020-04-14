@@ -4,16 +4,23 @@
  * needs to make in Pacman class against BasicCharacter class is to implement the abstract
  * method update();
  */
-public class Pacman extends BasicCharacter{
+public class Pacman {
 
 	public int stepSize = 0; // must be factor of blockSize (length of row and col)
 	private Map map;
 	private boolean isAddScore;
 	private Directions nextDir;
+	private int x;
+	private int y;
+	private Directions dir;	
+	private String charImageLink;
 
 	
 	public Pacman(int x, int y, Directions dir, String charImageLink, Map m) {
-		super(x, y, dir, charImageLink);
+		this.x = x;
+		this.y = y;
+		this.dir = dir;
+		this.charImageLink = charImageLink;
 		map = m;
 		nextDir = Directions.STILL;
 	}
@@ -39,6 +46,10 @@ public class Pacman extends BasicCharacter{
 				x = dir == Directions.LEFT ? x - stepSize : x + stepSize;
 			}
 		}
+	}
+	
+	public void render() {
+		
 	}
 
 	/**

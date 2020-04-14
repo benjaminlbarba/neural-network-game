@@ -45,6 +45,7 @@ public class Game extends BasicGame{
 				gameWindowHeight);
 		
 		this.map = new Map(mapData, elementPixelUnit, this.getMapOriginX(), this.getMapOriginY());
+		this.ghost = new Ghost(50, 50, elementPixelUnit);
 	}
 	
 	// Fit the map fully to the window by returning the smaller convertionRatio between width and height
@@ -74,6 +75,7 @@ public class Game extends BasicGame{
 	@Override
 	public void init(GameContainer gameContainer) {
 		this.map.init();
+		this.ghost.init();
 	}
 	
 	/**
@@ -82,6 +84,7 @@ public class Game extends BasicGame{
 	 */
 	@Override
 	public void update(GameContainer container, int delta) {
+		this.ghost.update();
 		
 	}
 	
@@ -92,6 +95,7 @@ public class Game extends BasicGame{
 	@Override
 	public void render(GameContainer container, Graphics g) {
 		this.map.render();
+		this.ghost.render();
 	}
 	
 	/**
