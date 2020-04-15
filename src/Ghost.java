@@ -1,5 +1,7 @@
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 
 /**
  * Ghost is the class inherited from BasicCharacter class that contains all relevant 
@@ -8,8 +10,7 @@ import org.newdawn.slick.SlickException;
  * method update();
  */
 public class Ghost {
-	private Image[] whiteGhostLeftImages = new Image[2];
-	private boolean ghostFrameToggle = true;
+	private Animation whiteGhostLeftAminition;
 	
 	private int x;
 	private int y;
@@ -24,8 +25,9 @@ public class Ghost {
 
 	public void init() {
 		try {
-			this.whiteGhostLeftImages[0] = new Image("images/ghosts/white/white_left_1.png");
-			this.whiteGhostLeftImages[1] = new Image("images/ghosts/white/white_left_2.png");
+			SpriteSheet whiteGhostLeftSpriteSheet = new SpriteSheet("images/ghosts/white/white_up.png", 52, 52);
+			this.whiteGhostLeftAminition = new Animation(whiteGhostLeftSpriteSheet, 200);
+			
 		} catch (SlickException e) {
 			System.out.println("Cannot load ghost images.");
 		}
@@ -38,13 +40,12 @@ public class Ghost {
 	 * it updates the positions (x, y) and directions (dir) of the Ghost without needing to process
 	 * any keyboard input. 
 	 */
-	public void update() {
-		this.ghostFrameToggle = !this.ghostFrameToggle;
+	public void update(int delta) {
+		this.whiteGhostLeftAminition.update(delta);
 	}
 	
 	public void render() {
-		int frameIndex = this.ghostFrameToggle ? 1 : 0;
 		// TODO: all four inputs need to be recalculated
-		this.whiteGhostLeftImages[frameIndex].draw(this.x, this.x, elementPixelUnit, elementPixelUnit);
+		this.whiteGhostLeftAminition.draw(this.x, this.x, elementPixelUnit, elementPixelUnit);
 	}
 }

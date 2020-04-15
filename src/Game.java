@@ -84,7 +84,7 @@ public class Game extends BasicGame{
 	 */
 	@Override
 	public void update(GameContainer container, int delta) {
-		this.ghost.update();
+		this.ghost.update(delta);
 		
 	}
 	
