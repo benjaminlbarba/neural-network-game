@@ -1,9 +1,13 @@
 import java.io.Console;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Shape;
 
 /**
  * Map is in charge of the following functionalities: 
@@ -22,6 +26,7 @@ public class Map {
 	private float mapOriginY;
 	
 	private char[][] mapData;
+	private ArrayList<Shape> wallShapes = new ArrayList<Shape>();
 	
 	private int initialDotCount;
 	private int currentDotCount;
@@ -67,17 +72,7 @@ public class Map {
 	 * It renders the updated map based on the updated data (mainly updated location of dots).
 	 */
 	public void render() {
-		for (int r = 0; r < this.mapDataRowCount; r++) {
-			for (int c = 0; c < this.mapDataColCount; c++) {
-				char elementSymbol = mapData[r][c];
-				// wall
-				if (elementSymbol == '#') {
-					float x = getElementX(c);
-					float y = getElementY(r);
-					this.wallElementImage.draw(x, y, elementPixelUnit, elementPixelUnit);
-				}
-			}
-		}
+		this.drawWallsAndCreateWallShapes();
 	}
 	
 	/**
@@ -94,4 +89,33 @@ public class Map {
 	private float getElementY(int rowNumber) {
 		return this.elementPixelUnit * rowNumber + this.mapOriginY;
 	}
+	
+	private void drawWallsAndCreateWallShapes() {
+		for (int r = 0; r < this.mapDataRowCount; r++) {
+			for (int c = 0; c < this.mapDataColCount; c++) {
+				char elementSymbol = this.mapData[r][c];
+				// wall
+				if (elementSymbol == '#') {
+					float x = this.getElementX(c);
+					float y = this.getElementY(r);
+					this.wallElementImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
+					this.wallShapes.add(new Rectangle(x, y, this.elementPixelUnit, this.elementPixelUnit));
+				}
+			}
+		}
+	}
+
+	// Get wallShapes that are within 1.5 * elementPixelUnit for both x an dy because collision could only happen
+	// with shapes nearby
+	public ArrayList<Shape> getCloseByWallShapes(float x, float y) {
+		ArrayList<Shape> closeByWallShapes = new ArrayList<Shape>(this.wallShapes);
+		closeByWallShapes.removeIf(
+			s -> 
+				(Math.abs(s.getX() - x) > 1.5 * this.elementPixelUnit) || 
+				(Math.abs(s.getY() - y) > 1.5 * this.elementPixelUnit)
+		);
+		
+		return closeByWallShapes;
+	}
+
 }
