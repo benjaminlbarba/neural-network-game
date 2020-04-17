@@ -22,7 +22,7 @@ public class Game extends BasicGame{
 	private Score score;
 	private int[] controlKeys;
 	
-	private char[][] mapData = MapCollections.map1;
+	private MapData mapData = MapCollections.map1;
 	
 	private Map map;
 	private Pacman pacman;
@@ -39,13 +39,16 @@ public class Game extends BasicGame{
 		initializeControlKeys();
 		
 		this.elementPixelUnit = this.getElementPixelUnit(
-				mapData[0].length, 
-				mapData.length, 
+				mapData.mapArray[0].length, 
+				mapData.mapArray.length, 
 				gameWindowWidth, 
 				gameWindowHeight);
 		
 		this.map = new Map(mapData, elementPixelUnit, this.getMapOriginX(), this.getMapOriginY());
-		this.ghost = new Ghost(200, 200, elementPixelUnit);
+		this.ghost = new Ghost(
+				this.map.getXFromColNumber(this.mapData.ghostStartPointColNumber), 
+				this.map.getYFromRowNumber(this.mapData.ghostStartPointRowNumber), 
+				elementPixelUnit);
 	}
 	
 	// Fit the map fully to the window by returning the smaller convertionRatio between width and height
@@ -61,12 +64,12 @@ public class Game extends BasicGame{
 	
 	// Find the x for origin of the map for it to be displayed at the center of the screen using 70% of the width 
 	private float getMapOriginX() {
-		return (this.gameWindowWidth - mapData[0].length * this.elementPixelUnit) / 2;
+		return (this.gameWindowWidth - mapData.mapArray[0].length * this.elementPixelUnit) / 2;
 	}
 	
 	// Find the y for origin of the map for it to be displayed at the center of the screen using 70% of the height 
 	private float getMapOriginY() {
-		return (this.gameWindowHeight - mapData.length * this.elementPixelUnit) / 2;
+		return (this.gameWindowHeight - mapData.mapArray.length * this.elementPixelUnit) / 2;
 	}
 
 	/**

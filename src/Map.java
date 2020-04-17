@@ -25,7 +25,7 @@ public class Map {
 	private float mapOriginX;
 	private float mapOriginY;
 	
-	private char[][] mapData;
+	private MapData mapData;
 	private ArrayList<Shape> wallShapes = new ArrayList<Shape>();
 	
 	private int initialDotCount;
@@ -34,15 +34,15 @@ public class Map {
 	private Image wallElementImage;
 	private Image dotImage;
 	
-	public Map(char[][] mapData, float elementPixelUnit, float mapOriginX, float mapOriginY) {
+	public Map(MapData mapData, float elementPixelUnit, float mapOriginX, float mapOriginY) {
 		this.mapData = mapData;
 		
 		this.elementPixelUnit = elementPixelUnit;
 		this.mapOriginX = mapOriginX;
 		this.mapOriginY = mapOriginY;
 		
-		this.mapDataRowCount = mapData.length;
-		this.mapDataColCount = mapData[0].length;
+		this.mapDataRowCount = mapData.mapArray.length;
+		this.mapDataColCount = mapData.mapArray[0].length;
 		this.initialDotCount = countMapDots();
 	}
 	
@@ -82,22 +82,22 @@ public class Map {
 		return 0;
 	}
 	
-	private float getElementX(int columnNumber) {
+	public float getXFromColNumber(int columnNumber) {
 		return this.elementPixelUnit * columnNumber + this.mapOriginX;
 	}
 	
-	private float getElementY(int rowNumber) {
+	public float getYFromRowNumber(int rowNumber) {
 		return this.elementPixelUnit * rowNumber + this.mapOriginY;
 	}
 	
 	private void drawWallsAndCreateWallShapes() {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
-				char elementSymbol = this.mapData[r][c];
+				char elementSymbol = this.mapData.mapArray[r][c];
 				// wall
 				if (elementSymbol == '#') {
-					float x = this.getElementX(c);
-					float y = this.getElementY(r);
+					float x = this.getXFromColNumber(c);
+					float y = this.getYFromRowNumber(r);
 					this.wallElementImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
 					this.wallShapes.add(new Rectangle(x, y, this.elementPixelUnit, this.elementPixelUnit));
 				}

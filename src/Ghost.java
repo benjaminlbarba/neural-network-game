@@ -60,7 +60,7 @@ public class Ghost {
 	
 	public void render(Graphics g) {
 		// TODO: all four inputs need to be recalculated
-		this.ghostLeftAminition.draw(this.x, this.x, elementPixelUnit, elementPixelUnit);
+		this.ghostLeftAminition.draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
 		
 		if (this.isColliding) {
 			g.drawString("GhostCollision: true", 50, 50);
