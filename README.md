@@ -1,13 +1,13 @@
 # MCIT-591 Final Project
 
-###Overview
+### Overview
 
 In light of the Blackjack Solitaire game that we designed in project 3, our group is proposing to
 develop a 2-dimensional Pac-Man game, in which the player controls Pac-Man, who must eat all
 the "dots" and avoid the "ghosts" within a enclosed maze. If Pac-Man makes contact with the
 ghosts, he will lose a life and the game ends if Pac-Man loses all his lives.
 
-###Goals
+### Goals
 
 * **Primary Goals:** The board UI can be displayed properly and users are able to control the
 Pacman to move. Scores can also be recorded. Game will terminate if the pac man hits a
@@ -16,7 +16,7 @@ ghost.
 ghosts and speed. There can be a 'treasure' entity that provides the pec man the ability
 to overcome the ghost in the next 20 seconds.
 
-###Specifications
+### Specifications
 
 Ghost (Yufei): Generally, the game starts with 4 ghosts. As the levels increase, the number of
 ghosts gradually increases each level. In addition, the speed of movement for each ghost also
