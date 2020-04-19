@@ -1,6 +1,9 @@
+import java.util.ArrayList;
+
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.Graphics;
 
 /**
@@ -29,7 +32,7 @@ public class Game extends BasicGame{
 	// For the initial implementation, we are just implementing one ghost. After the basic game is created, we will set up more ghosts.
 	private Ghost ghost;
 	
-	public Game(String title, int gameWindowWidth, int gameWindowHeight) {
+	public Game(String title, int gameWindowWidth, int gameWindowHeight, boolean isDebug) {
 		super(title);
 		
 		this.gameWindowWidth = gameWindowWidth;
@@ -44,11 +47,12 @@ public class Game extends BasicGame{
 				gameWindowWidth, 
 				gameWindowHeight);
 		
-		this.map = new Map(mapData, elementPixelUnit, this.getMapOriginX(), this.getMapOriginY());
+		this.map = new Map(mapData, elementPixelUnit, this.getMapOriginX(), this.getMapOriginY(), isDebug);
 		this.ghost = new Ghost(
 				this.map.getXFromColNumber(this.mapData.ghostStartPointColNumber), 
 				this.map.getYFromRowNumber(this.mapData.ghostStartPointRowNumber), 
-				elementPixelUnit);
+				elementPixelUnit,
+				isDebug);
 	}
 	
 	// Fit the map fully to the window by returning the smaller convertionRatio between width and height
@@ -87,8 +91,11 @@ public class Game extends BasicGame{
 	 */
 	@Override
 	public void update(GameContainer container, int delta) {
-		this.ghost.setWallShapesAroundGhost(this.map.getCloseByWallShapes(this.ghost.getX(), this.ghost.getY()));
-		this.ghost.update(delta);
+		// update for ghost
+		ArrayList<Shape> closeByWallShapes = this.map.getCloseByWallShapes(this.ghost.getX(), this.ghost.getY());
+		float ghostClosestNonCollisionX = this.map.getClosestNonCollisionX(this.ghost.getX());
+		float ghostClosestNonCollisionY = this.map.getClosestNonCollisionY(this.ghost.getY());
+		this.ghost.update(delta, closeByWallShapes, ghostClosestNonCollisionX, ghostClosestNonCollisionY);
 		
 	}
 	
@@ -98,7 +105,7 @@ public class Game extends BasicGame{
 	 */
 	@Override
 	public void render(GameContainer container, Graphics g) {
-		this.map.render();
+		this.map.render(g);
 		this.ghost.render(g);
 	}
 	

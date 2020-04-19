@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
@@ -18,6 +19,8 @@ import org.newdawn.slick.geom.Shape;
  * 
  */
 public class Map {
+	private boolean isDebug;
+
 	private int mapDataRowCount;
 	private int mapDataColCount;
 	
@@ -34,7 +37,9 @@ public class Map {
 	private Image wallElementImage;
 	private Image dotImage;
 	
-	public Map(MapData mapData, float elementPixelUnit, float mapOriginX, float mapOriginY) {
+	public Map(MapData mapData, float elementPixelUnit, float mapOriginX, float mapOriginY, boolean isDebug) {
+		this.isDebug = isDebug;
+
 		this.mapData = mapData;
 		
 		this.elementPixelUnit = elementPixelUnit;
@@ -71,8 +76,8 @@ public class Map {
 	 * executed after update method in every frame.
 	 * It renders the updated map based on the updated data (mainly updated location of dots).
 	 */
-	public void render() {
-		this.drawWallsAndCreateWallShapes();
+	public void render(Graphics g) {
+		this.drawWallsAndCreateWallShapes(g);
 	}
 	
 	/**
@@ -90,7 +95,7 @@ public class Map {
 		return this.elementPixelUnit * rowNumber + this.mapOriginY;
 	}
 	
-	private void drawWallsAndCreateWallShapes() {
+	private void drawWallsAndCreateWallShapes(Graphics g) {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
 				char elementSymbol = this.mapData.mapArray[r][c];
@@ -98,8 +103,14 @@ public class Map {
 				if (elementSymbol == '#') {
 					float x = this.getXFromColNumber(c);
 					float y = this.getYFromRowNumber(r);
-					this.wallElementImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
-					this.wallShapes.add(new Rectangle(x, y, this.elementPixelUnit, this.elementPixelUnit));
+					Rectangle currentWallElementRec = new Rectangle(x, y, this.elementPixelUnit, this.elementPixelUnit);
+					if (isDebug) {
+						g.draw(currentWallElementRec);
+					}
+					else {
+						this.wallElementImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
+					}
+					this.wallShapes.add(currentWallElementRec);
 				}
 			}
 		}
@@ -116,6 +127,28 @@ public class Map {
 		);
 		
 		return closeByWallShapes;
+	}
+
+	// This method provides x value for repositioning a character to its closest non-collision position on the map.
+	public float getClosestNonCollisionX(float currentX) {
+		int closestColNumber = this.getClosestCol(currentX);
+
+		return this.getXFromColNumber(closestColNumber);
+	}
+
+	// This method provides y value for repositioning a character to its closest non-collision position on the map.
+	public float getClosestNonCollisionY(float currentY) {
+		int closestRowNumber = this.getClosestRow(currentY);
+
+		return this.getYFromRowNumber(closestRowNumber);
+	}
+
+	private int getClosestCol(float currentX) {
+		return Math.round((currentX - this.mapOriginX) / this.elementPixelUnit);
+	}
+
+	private int getClosestRow(float currentY) {
+		return Math.round((currentY - this.mapOriginY) / this.elementPixelUnit);
 	}
 
 }

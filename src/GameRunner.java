@@ -12,7 +12,7 @@ public class GameRunner {
 		int gameWindowWidth = 800;
 		int gameWindowHeight = 600;
 		
-		Game pacmanGame = new Game("Pacman", gameWindowWidth, gameWindowHeight);
+		Game pacmanGame = new Game("Pacman", gameWindowWidth, gameWindowHeight, false);
 		AppGameContainer appGameContainer = new AppGameContainer(pacmanGame);
 		
 		appGameContainer.setDisplayMode(gameWindowWidth, gameWindowHeight, false);
