@@ -25,7 +25,7 @@ public class Game extends BasicGame{
 	private Score score;
 	private int[] controlKeys;
 	
-	private MapData mapData = MapCollections.map1;
+	private MapData mapData = MapCollections.getMapData(2);
 	
 	private Map map;
 	private Pacman pacman;
