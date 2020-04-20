@@ -29,7 +29,7 @@ public class Map {
 	private float mapOriginY;
 	
 	private MapData mapData;
-	private ArrayList<Shape> wallShapes = new ArrayList<Shape>();
+	private ArrayList<Shape> wallShapes = new ArrayList<>();
 	
 	private int initialDotCount;
 	private int currentDotCount;
@@ -45,7 +45,9 @@ public class Map {
 		
 		this.elementPixelUnit = elementPixelUnit;
 		this.mapOriginX = mapOriginX;
+		System.out.println("mapOriginX="+mapOriginX);
 		this.mapOriginY = mapOriginY;
+		System.out.println("mapOriginY="+mapOriginY);
 		
 		this.mapDataRowCount = mapData.mapArray.length;
 		this.mapDataColCount = mapData.mapArray[0].length;
@@ -125,7 +127,7 @@ public class Map {
 	// Get wallShapes that are within 1.5 * elementPixelUnit for both x an dy because collision could only happen
 	// with shapes nearby
 	public ArrayList<Shape> getCloseByWallShapes(float x, float y) {
-		ArrayList<Shape> closeByWallShapes = new ArrayList<Shape>(this.wallShapes);
+		ArrayList<Shape> closeByWallShapes = new ArrayList<>(this.wallShapes);
 		closeByWallShapes.removeIf(
 			s -> 
 				(Math.abs(s.getX() - x) > 1.5 * this.elementPixelUnit) || 

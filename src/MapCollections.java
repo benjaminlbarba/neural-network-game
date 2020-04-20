@@ -36,7 +36,7 @@ public class MapCollections {
 				{'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'}
 			},
 		};
-	private static int[] pacmanStartPointRowNumbers = {7, 7, 7};
+	private static int[] pacmanStartPointRowNumbers = {1, 1, 1};
 	private static int[] pacmanStartPointColNumbers = {1, 1, 1};
 	private static int[] ghostStartPointRowNumbers = {1, 1, 1};
 	private static int[] ghostStartPointColNumbers = {4, 4, 8};

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
@@ -23,7 +24,7 @@ public class Game extends BasicGame{
 	private float mapWindowRatio = (float) 0.7;
 
 	private Score score;
-	private int[] controlKeys;
+	private HashMap<Integer, Directions> keyMap;
 	
 	private MapData mapData = MapCollections.getMapData(2);
 	
@@ -31,10 +32,10 @@ public class Game extends BasicGame{
 	private Pacman pacman;
 	// For the initial implementation, we are just implementing one ghost. After the basic game is created, we will set up more ghosts.
 	private Ghost ghost;
-	
+
 	public Game(String title, int gameWindowWidth, int gameWindowHeight, boolean isDebug) {
 		super(title);
-		
+		initKeyMap();
 		this.gameWindowWidth = gameWindowWidth;
 		this.gameWindowHeight = gameWindowHeight;
 		
@@ -53,8 +54,22 @@ public class Game extends BasicGame{
 				this.map.getYFromRowNumber(this.mapData.ghostStartPointRowNumber), 
 				elementPixelUnit,
 				isDebug);
+		this.pacman = new Pacman(
+				this.map.getXFromColNumber(this.mapData.pacmanStartPointColNumber),
+				this.map.getYFromRowNumber(this.mapData.pacmanStartPointRowNumber),
+				elementPixelUnit,
+				map,
+				isDebug);
 	}
-	
+
+	private void initKeyMap() {
+		keyMap = new HashMap<Integer, Directions>();
+		keyMap.put(Input.KEY_LEFT, Directions.LEFT);
+		keyMap.put(Input.KEY_RIGHT, Directions.RIGHT);
+		keyMap.put(Input.KEY_UP, Directions.UP);
+		keyMap.put(Input.KEY_DOWN, Directions.DOWN);
+	}
+
 	// Fit the map fully to the window by returning the smaller convertionRatio between width and height
 	private float getElementPixelUnit(int mapRowCount, int mapColumnCount, float gameWindowWidth,
 			float gameWindowHeight) {
@@ -83,6 +98,7 @@ public class Game extends BasicGame{
 	public void init(GameContainer gameContainer) {
 		this.map.init();
 		this.ghost.init();
+		this.pacman.init();
 	}
 	
 	/**
@@ -93,10 +109,11 @@ public class Game extends BasicGame{
 	public void update(GameContainer container, int delta) {
 		// update for ghost
 		ArrayList<Shape> closeByWallShapes = this.map.getCloseByWallShapes(this.ghost.getX(), this.ghost.getY());
+		ArrayList<Shape> pacmanCloseByWallShapes = this.map.getCloseByWallShapes(this.pacman.getX(), this.pacman.getY());
 		float ghostClosestNonCollisionX = this.map.getClosestNonCollisionX(this.ghost.getX());
 		float ghostClosestNonCollisionY = this.map.getClosestNonCollisionY(this.ghost.getY());
 		this.ghost.update(delta, closeByWallShapes, ghostClosestNonCollisionX, ghostClosestNonCollisionY);
-		
+		this.pacman.update(delta, pacmanCloseByWallShapes);
 	}
 	
 	/**
@@ -107,6 +124,7 @@ public class Game extends BasicGame{
 	public void render(GameContainer container, Graphics g) {
 		this.map.render(g);
 		this.ghost.render(g);
+		this.pacman.render(g);
 	}
 	
 	/**
@@ -114,7 +132,9 @@ public class Game extends BasicGame{
 	 */
 	@Override
 	public void keyPressed(int key, char c) {
-		
+		if (keyMap.containsKey(key)) {
+			pacman.setNextDirection(keyMap.get(key));
+		}
 	}
 	
 	/**
@@ -122,7 +142,12 @@ public class Game extends BasicGame{
 	 */
 	@Override
 	public void keyReleased(int key, char c) {
-		
+		if (keyMap.containsKey(key)) {
+			Directions keyDirection = keyMap.get(key);
+			if (pacman.getNextDir() == keyDirection) {
+				pacman.setNextDirection(Directions.STILL);
+			}
+		}
 	}
 	
 	/**
