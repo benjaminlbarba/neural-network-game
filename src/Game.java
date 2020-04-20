@@ -53,6 +53,7 @@ public class Game extends BasicGame{
 				this.map.getXFromColNumber(this.mapData.ghostStartPointColNumber), 
 				this.map.getYFromRowNumber(this.mapData.ghostStartPointRowNumber), 
 				elementPixelUnit,
+				GhostColors.RED,
 				isDebug);
 		this.pacman = new Pacman(
 				this.map.getXFromColNumber(this.mapData.pacmanStartPointColNumber),
@@ -97,8 +98,8 @@ public class Game extends BasicGame{
 	@Override
 	public void init(GameContainer gameContainer) {
 		this.map.init();
-		this.ghost.init();
 		this.pacman.init();
+		this.ghost.init(this.pacman.getCenterX(), this.pacman.getCenterY());
 	}
 	
 	/**
@@ -112,7 +113,13 @@ public class Game extends BasicGame{
 		ArrayList<Shape> pacmanCloseByWallShapes = this.map.getCloseByWallShapes(this.pacman.getX(), this.pacman.getY());
 		float ghostClosestNonCollisionX = this.map.getClosestNonCollisionX(this.ghost.getX());
 		float ghostClosestNonCollisionY = this.map.getClosestNonCollisionY(this.ghost.getY());
-		this.ghost.update(delta, closeByWallShapes, ghostClosestNonCollisionX, ghostClosestNonCollisionY);
+		this.ghost.update(
+				delta,
+				closeByWallShapes,
+				ghostClosestNonCollisionX,
+				ghostClosestNonCollisionY,
+				this.pacman.getCenterX(),
+				this.pacman.getCenterY());
 		this.pacman.update(delta, pacmanCloseByWallShapes);
 	}
 	

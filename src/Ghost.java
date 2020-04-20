@@ -1,7 +1,6 @@
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.HashMap;
 
-import org.lwjgl.Sys;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -18,11 +17,16 @@ import org.newdawn.slick.geom.Shape;
 public class Ghost {
 	private boolean isDebug;
 
+	private GhostColors ghostColor;
+	private HashMap<Directions, Animation> ghostAnimations = new HashMap<>();
+	private static final int ghostSpriteHeight = 52;
+	private static final int ghostSpriteWidth = 52;
+	private static final int ghostAnimationSpriteDuration = 200;
+
 	private float ghostCircleRadius;
 
 	private float elementPixelUnit;
 	
-	private Animation ghostLeftAminition;
 	private Circle ghostCircle;
 	private ArrayList<Shape> wallShapesAroundGhost;
 
@@ -38,7 +42,8 @@ public class Ghost {
 	private float pacmanCenterX;
 	private float pacmanCenterY;
 		
-	public Ghost(float initialX, float initialY, float elementPixelUnit, boolean isDebug) {
+	public Ghost(float initialX, float initialY, float elementPixelUnit, GhostColors ghostColor, boolean isDebug) {
+		this.ghostColor = ghostColor;
 		this.isDebug = isDebug;
 
 		this.x = initialX;
@@ -51,27 +56,66 @@ public class Ghost {
 	}
 
 	public void init(float pacmanCenterX, float pacmanCenterY) {
+		this.speed = 1;
+		this.dir = Directions.DOWN;
+
+		this.pacmanCenterX = pacmanCenterX;
+		this.pacmanCenterY = pacmanCenterY;
+
+		this.initializeGhostAnimations();
+
+		// ghostCircle is center positioned while ghost animation is positioned based on top left corner
+		// This is the conversion between animation coordinate and circle coordinate so that they fully overlap.
+		this.ghostCircle = new Circle(
+				this.x + this.elementPixelUnit / 2,
+				this.y + this.elementPixelUnit / 2,
+				this.ghostCircleRadius);
+	}
+
+	private void initializeGhostAnimations() {
 		try {
-			this.speed = 1;
-			this.dir = Directions.RIGHT;
+			SpriteSheet upSpriteSheet = new SpriteSheet(
+					this.getGhostSpriteFolderLink(this.ghostColor, Directions.UP),
+					ghostSpriteWidth,
+					ghostSpriteHeight
+			);
+			Animation upAnimation = new Animation(upSpriteSheet, this.ghostAnimationSpriteDuration);
 
-			this.pacmanCenterX = pacmanCenterX;
-			this.pacmanCenterY = pacmanCenterY;
+			SpriteSheet downSpriteSheet = new SpriteSheet(
+					this.getGhostSpriteFolderLink(this.ghostColor, Directions.DOWN),
+					ghostSpriteWidth,
+					ghostSpriteHeight
+			);
+			Animation downAnimation = new Animation(downSpriteSheet, this.ghostAnimationSpriteDuration);
 
-			SpriteSheet whiteGhostLeftSpriteSheet = new SpriteSheet("images/ghosts/white/white_up.png", 52, 52);
-			this.ghostLeftAminition = new Animation(whiteGhostLeftSpriteSheet, 200);
-			
-			// ghostCircle is center positioned while ghost animation is positioned based on top left corner
-			// This is the conversion between animation coordinate and circle coordinate so that they fully overlap.
-			this.ghostCircle = new Circle(
-					this.x + this.elementPixelUnit / 2, 
-					this.y + this.elementPixelUnit / 2, 
-					this.ghostCircleRadius);
-			
+			SpriteSheet leftSpriteSheet = new SpriteSheet(
+					this.getGhostSpriteFolderLink(this.ghostColor, Directions.LEFT),
+					ghostSpriteWidth,
+					ghostSpriteHeight
+			);
+			Animation leftAnimation = new Animation(leftSpriteSheet, this.ghostAnimationSpriteDuration);
+
+			SpriteSheet rightSpriteSheet = new SpriteSheet(
+					this.getGhostSpriteFolderLink(this.ghostColor, Directions.RIGHT),
+					ghostSpriteWidth,
+					ghostSpriteHeight
+			);
+			Animation rightAnimation = new Animation(rightSpriteSheet, this.ghostAnimationSpriteDuration);
+
+			this.ghostAnimations.put(Directions.UP, upAnimation);
+			this.ghostAnimations.put(Directions.DOWN, downAnimation);
+			this.ghostAnimations.put(Directions.LEFT, leftAnimation);
+			this.ghostAnimations.put(Directions.RIGHT, rightAnimation);
 		} catch (SlickException e) {
-			System.out.println("Cannot load ghost images.");
+			e.printStackTrace();
 		}
+	}
 
+	private String getGhostSpriteFolderLink(GhostColors color, Directions direction) {
+		String colorString = color.toString().toLowerCase();
+		String directionString = direction.toString().toLowerCase();
+
+		return "images/ghosts/" + colorString + "/" + colorString + "_" + directionString + ".png";
 	}
 	
 	/**
@@ -95,7 +139,7 @@ public class Ghost {
 		this.closestNonCollisionX = closestNonCollisionX;
 		this.closestNonCollisionY = closestNonCollisionY;
 
-		this.ghostLeftAminition.update(delta);
+		this.ghostAnimations.values().forEach(animation -> animation.update(delta));
 		this.updateGhostCirclePosition();
 		this.setIsColliding();
 		this.smartMovePerFrame();
@@ -103,7 +147,7 @@ public class Ghost {
 	
 	public void render(Graphics g) {
 		// TODO: all four inputs need to be recalculated
-		this.ghostLeftAminition.draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
+		this.ghostAnimations.get(this.dir).draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
 		if (isDebug) {
 			g.draw(this.ghostCircle);
 		}
@@ -191,13 +235,11 @@ public class Ghost {
 		float newDistance = 0;
 
 		for (Directions currentDir : availableDirections) {
-			System.out.println("CurrentDir: " + this.dir);
 			switch (currentDir) {
 				case UP:
 					// Unless ghost and pacman are on the same path,
 					// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
 					if (availableDirections.size() > 1 && !this.getOnSameVerticalPathWithPacman() && this.getReverseDirection(this.dir) == Directions.UP) {
-						System.out.println("Up removed");
 						break;
 					}
 					newDistance = this.getDistanceBetweenTwoPoints(
@@ -215,7 +257,6 @@ public class Ghost {
 					// Unless ghost and pacman are on the same path,
 					// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
 					if (availableDirections.size() > 1 && !this.getOnSameVerticalPathWithPacman() && this.getReverseDirection(this.dir) == Directions.DOWN) {
-						System.out.println("Down removed");
 						break;
 					}
 					newDistance = this.getDistanceBetweenTwoPoints(
@@ -233,7 +274,6 @@ public class Ghost {
 					// Unless ghost and pacman are on the same path,
 					// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
 					if (availableDirections.size() > 1 && !this.getOnSameHorizontalPathWithPacman() && this.getReverseDirection(this.dir) == Directions.LEFT) {
-						System.out.println("Left removed");
 						break;
 					}
 					newDistance = this.getDistanceBetweenTwoPoints(
@@ -252,7 +292,6 @@ public class Ghost {
 					// Unless ghost and pacman are on the same path,
 					// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
 					if (availableDirections.size() > 1 && !this.getOnSameHorizontalPathWithPacman() && this.getReverseDirection(this.dir) == Directions.RIGHT) {
-						System.out.println("Right removed");
 						break;
 					}
 					newDistance = this.getDistanceBetweenTwoPoints(
@@ -275,16 +314,12 @@ public class Ghost {
 	private boolean getOnSameHorizontalPathWithPacman() {
 		boolean onSameHorizontalPathWithPacman =
 				Math.abs(this.pacmanCenterY - this.ghostCircle.getCenterY()) < this.elementPixelUnit / 3;
-		System.out.println("this.pacmanCenterY: " + this.pacmanCenterY);
-		System.out.println("this.ghostCircle.getCenterY(): " + this.ghostCircle.getCenterY());
-		System.out.println("onSameHorizontalPathWithPacman: " + onSameHorizontalPathWithPacman);
 		return onSameHorizontalPathWithPacman;
 	}
 
 	private boolean getOnSameVerticalPathWithPacman() {
 		boolean onSameVerticalPathWithPacman =
 				Math.abs(this.pacmanCenterX - this.ghostCircle.getCenterX()) < this.elementPixelUnit / 3;
-		//System.out.println("onSameVerticalPathWithPacman: " + onSameVerticalPathWithPacman);
 		return onSameVerticalPathWithPacman;
 	}
 
@@ -350,7 +385,6 @@ public class Ghost {
 			availableDirections.add(Directions.DOWN);
 		}
 
-		System.out.println(availableDirections);
 		return availableDirections;
 	}
 

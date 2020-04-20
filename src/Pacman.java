@@ -20,8 +20,13 @@ public class Pacman {
 	private Map map;
 	private boolean isAddScore;
 	private Directions nextDir;
+
 	private float x;
 	private float y;
+
+	private float centerX;
+	private float centerY;
+
 	private float elementPixelUnit;
 	private Directions dir;
 	private Circle pacmanCircle;
@@ -55,9 +60,12 @@ public class Pacman {
 
 			// ghostCircle is center positioned while ghost animation is positioned based on top left corner
 			// This is the conversion between animation coordinate and circle coordinate so that they fully overlap.
+			this.centerX = this.x + this.elementPixelUnit / 2;
+			this.centerY = this.y + this.elementPixelUnit / 2;
+
 			this.pacmanCircle = new Circle(
-					this.x + this.elementPixelUnit / 2,
-					this.y + this.elementPixelUnit / 2,
+					this.centerX,
+					this.centerY,
 					this.pacmanCircleRadius);
 
 		} catch (SlickException e) {
@@ -153,8 +161,11 @@ public class Pacman {
 	 * This method updates the center x,y of the circle based on the x, y of the pacman animation.
 	 */
 	private void updatePacmanCirclePosition() {
-		this.pacmanCircle.setCenterX(this.x + this.elementPixelUnit / 2);
-		this.pacmanCircle.setCenterY(this.y + this.elementPixelUnit / 2);
+		this.centerX = this.x + this.elementPixelUnit / 2;
+		this.centerY = this.y + this.elementPixelUnit / 2;
+
+		this.pacmanCircle.setCenterX(centerX);
+		this.pacmanCircle.setCenterY(centerY);
 	}
 
 	/**
@@ -217,6 +228,14 @@ public class Pacman {
 	 */
 	public float getY() {
 		return y;
+	}
+
+	public float getCenterX() {
+		return centerX;
+	}
+
+	public float getCenterY() {
+		return centerY;
 	}
 
 	/**
