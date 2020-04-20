@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public class Pacman {
 
-    public static final float stepSize = 1.3f;
+    public static final float stepSize = 1; // must be factor of blockSize (length of row and col)
     private Map map;
     private boolean isAddScore;
     private Directions nextDir;
@@ -174,7 +174,7 @@ public class Pacman {
     /**
      * Return whether next position is accessible given dir.
      *
-     * @param d direction for next position
+     * @param dir direction for next position
      * @return boolean whether next position is accessible given dir.
      * @see Directions
      */
