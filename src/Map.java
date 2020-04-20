@@ -35,6 +35,7 @@ public class Map {
 	private int currentDotCount;
 	
 	private Image wallElementImage;
+	private Image fruitImage;
 	private Image dotImage;
 	
 	public Map(MapData mapData, float elementPixelUnit, float mapOriginX, float mapOriginY, boolean isDebug) {
@@ -58,6 +59,8 @@ public class Map {
 	public void init() {
 		try {
 			this.wallElementImage = new Image("images/wallElement.jpg");
+			this.fruitImage = new Image("images/cherry.png");
+			this.dotImage = new Image("images/dot.png");
 		} catch (SlickException e) {
 			System.out.println("WallElement image cannot be found.");
 		}
@@ -99,10 +102,9 @@ public class Map {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
 				char elementSymbol = this.mapData.mapArray[r][c];
-				// wall
-				if (elementSymbol == '#') {
-					float x = this.getXFromColNumber(c);
-					float y = this.getYFromRowNumber(r);
+				float x = this.getXFromColNumber(c);
+				float y = this.getYFromRowNumber(r);
+				if (elementSymbol == '#') { // wall
 					Rectangle currentWallElementRec = new Rectangle(x, y, this.elementPixelUnit, this.elementPixelUnit);
 					if (isDebug) {
 						g.draw(currentWallElementRec);
@@ -111,6 +113,10 @@ public class Map {
 						this.wallElementImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
 					}
 					this.wallShapes.add(currentWallElementRec);
+				} else if (elementSymbol == '.') { // dots
+					this.dotImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
+				} else { // bonus fruit
+					this.fruitImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
 				}
 			}
 		}
