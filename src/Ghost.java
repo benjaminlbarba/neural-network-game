@@ -224,9 +224,6 @@ public class Ghost {
 
 		// Unless ghost and pacman are on the same path,
 		// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
-		//if (availableDirections.size() > 1) {
-		//	availableDirections.removeIf(d -> d == (this.getReverseDirection(this.dir)));
-		//}
 
 		float ghostCircleX = this.ghostCircle.getCenterX();
 		float ghostCircleY = this.ghostCircle.getCenterY();
@@ -425,8 +422,8 @@ public class Ghost {
 		// if the ghost is close enough to a nearest non collision location (path center) and the ghost temp circle
 		// (placed at the nearest path center) has more than 2 available directions
 		// (more than current direction and its reverse), it is also at intersection.
-		if (Math.abs(this.closestNonCollisionX - this.x) < this.speed &&
-				Math.abs(this.closestNonCollisionY - this.y) < this.speed &&
+		if (Math.abs(this.closestNonCollisionX - this.x) < this.speed / 2 &&
+				Math.abs(this.closestNonCollisionY - this.y) < this.speed / 2 &&
 				this.getAvailableDirections(this.closestNonCollisionX, this.closestNonCollisionY).size() > 2) {
 			this.isAtIntersection = true;
 			return;

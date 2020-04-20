@@ -63,8 +63,6 @@ public class Pacman {
 
     public void init() {
         try {
-
-
             SpriteSheet pacmanLeftSpriteSheet = new SpriteSheet("images/pacman/pacman_left.jpg", 18, 18);
             Animation leftAnimation = new Animation(pacmanLeftSpriteSheet, 200);
 
@@ -138,9 +136,9 @@ public class Pacman {
         this.pacmanAnimations.values().forEach(animation -> animation.update(delta));
         this.updatePacmanCirclePosition();
         this.setIsAtIntersectionAndCollidingWithWall();
-        System.out.println("nextdir:"+nextDir);
+        // System.out.println("nextdir:"+nextDir);
         if (dirMovable(nextDir)) {
-            System.out.println("1"+ isColliding);
+            //System.out.println("1"+ isColliding);
             dir = nextDir;
         }
         else if (isAtIntersection) {
@@ -179,18 +177,18 @@ public class Pacman {
      * @see Directions
      */
     private boolean dirMovable(Directions d) {
-        System.out.println(d);
+        //System.out.println(d);
         float nextX = x + elementPixelUnit * dirMapX.get(d);
-        System.out.println("x:"+x);
-        System.out.println("nextx:"+nextX);
+        //System.out.println("x:"+x);
+        //System.out.println("nextx:"+nextX);
         float nextY = y + elementPixelUnit * dirMapY.get(d);
-        System.out.println("y:"+y);
-        System.out.println("nexty:"+nextY);
+        //System.out.println("y:"+y);
+        //System.out.println("nexty:"+nextY);
         this.pacmanCircle.setCenterX(nextX + this.elementPixelUnit / 2);
         this.pacmanCircle.setCenterY(nextY + this.elementPixelUnit / 2);
         setIsColliding();
-        System.out.println(isColliding);
-        System.out.println("------------------");
+        //System.out.println(isColliding);
+        //System.out.println("------------------");
         updatePacmanCirclePosition();
         return !isColliding;
     }
@@ -253,8 +251,8 @@ public class Pacman {
         // if the ghost is close enough to a nearest non collision location (path center) and the pacman temp circle
         // (placed at the nearest path center) has more than 2 available directions
         // (more than current direction and its reverse), it is also at intersection.
-        if (Math.abs(this.closestNonCollisionX - this.x) < this.stepSize &&
-                Math.abs(this.closestNonCollisionY - this.y) < this.stepSize &&
+        if (Math.abs(this.closestNonCollisionX - this.x) < this.stepSize / 2 &&
+                Math.abs(this.closestNonCollisionY - this.y) < this.stepSize / 2 &&
                 this.getAvailableDirections(this.closestNonCollisionX, this.closestNonCollisionY).size() >= 2) {
             this.isAtIntersection = true;
             return;

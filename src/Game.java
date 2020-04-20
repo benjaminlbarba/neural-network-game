@@ -111,6 +111,7 @@ public class Game extends BasicGame{
 		// update for ghost
 		ArrayList<Shape> closeByWallShapes = this.map.getCloseByWallShapes(this.ghost.getX(), this.ghost.getY());
 		ArrayList<Shape> pacmanCloseByWallShapes = this.map.getCloseByWallShapes(this.pacman.getX(), this.pacman.getY());
+
 		float ghostClosestNonCollisionX = this.map.getClosestNonCollisionX(this.ghost.getX());
 		float ghostClosestNonCollisionY = this.map.getClosestNonCollisionY(this.ghost.getY());
 		float pacmanClosestNonCollisionX = this.map.getClosestNonCollisionX(this.pacman.getX());

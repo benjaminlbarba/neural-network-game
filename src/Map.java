@@ -20,6 +20,7 @@ import org.newdawn.slick.geom.Shape;
  */
 public class Map {
 	private boolean isDebug;
+	private boolean isFirstRender = true;
 
 	private int mapDataRowCount;
 	private int mapDataColCount;
@@ -66,14 +67,14 @@ public class Map {
 		} catch (SlickException e) {
 			System.out.println("WallElement image cannot be found.");
 		}
+		this.createWallShapes();
 	}
-	
+
 	/**
 	 * update method here gets called in the update method in Game class.
 	 * It updates the positions of the dots on the map as well as the count of the remaining dots.
 	 */
 	public void update() {
-		
 	}
 	
 	/**
@@ -82,7 +83,11 @@ public class Map {
 	 * It renders the updated map based on the updated data (mainly updated location of dots).
 	 */
 	public void render(Graphics g) {
-		this.drawWallsAndCreateWallShapes(g);
+		this.drawWalls();
+		this.drawWallElementRectangulars(g);
+		this.drawDotsAndFruits();
+
+		this.isFirstRender = false;
 	}
 	
 	/**
@@ -99,8 +104,22 @@ public class Map {
 	public float getYFromRowNumber(int rowNumber) {
 		return this.elementPixelUnit * rowNumber + this.mapOriginY;
 	}
-	
-	private void drawWallsAndCreateWallShapes(Graphics g) {
+
+	private void drawWallElementRectangulars(Graphics g) {
+		for (int r = 0; r < this.mapDataRowCount; r++) {
+			for (int c = 0; c < this.mapDataColCount; c++) {
+				float x = this.getXFromColNumber(c);
+				float y = this.getYFromRowNumber(r);
+				if (this.isDebug) {
+					Rectangle currentWallElementRec = new Rectangle(x, y, this.elementPixelUnit, this.elementPixelUnit);
+					g.draw(currentWallElementRec);
+				}
+			}
+		}
+
+	}
+
+	private void drawWalls() {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
 				char elementSymbol = this.mapData.mapArray[r][c];
@@ -108,16 +127,38 @@ public class Map {
 				float y = this.getYFromRowNumber(r);
 				if (elementSymbol == '#') { // wall
 					Rectangle currentWallElementRec = new Rectangle(x, y, this.elementPixelUnit, this.elementPixelUnit);
-					if (isDebug) {
-						g.draw(currentWallElementRec);
-					}
-					else {
+					if (!this.isDebug) {
 						this.wallElementImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
 					}
+				}
+			}
+		}
+	}
+
+	private void createWallShapes() {
+		for (int r = 0; r < this.mapDataRowCount; r++) {
+			for (int c = 0; c < this.mapDataColCount; c++) {
+				char elementSymbol = this.mapData.mapArray[r][c];
+				float x = this.getXFromColNumber(c);
+				float y = this.getYFromRowNumber(r);
+				if (elementSymbol == '#') { // wall
+					Rectangle currentWallElementRec = new Rectangle(x, y, this.elementPixelUnit, this.elementPixelUnit);
 					this.wallShapes.add(currentWallElementRec);
-				} else if (elementSymbol == '.') { // dots
+				}
+			}
+		}
+	}
+
+	private void drawDotsAndFruits() {
+		for (int r = 0; r < this.mapDataRowCount; r++) {
+			for (int c = 0; c < this.mapDataColCount; c++) {
+				char elementSymbol = this.mapData.mapArray[r][c];
+				float x = this.getXFromColNumber(c);
+				float y = this.getYFromRowNumber(r);
+				if (elementSymbol == '.') { // dots
 					this.dotImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
-				} else { // bonus fruit
+				}
+				if (elementSymbol == '*') { // bonus fruit
 					this.fruitImage.draw(x, y, this.elementPixelUnit, this.elementPixelUnit);
 				}
 			}
@@ -133,7 +174,7 @@ public class Map {
 				(Math.abs(s.getX() - x) > 1.5 * this.elementPixelUnit) || 
 				(Math.abs(s.getY() - y) > 1.5 * this.elementPixelUnit)
 		);
-		
+
 		return closeByWallShapes;
 	}
 
