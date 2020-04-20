@@ -113,6 +113,8 @@ public class Game extends BasicGame{
 		ArrayList<Shape> pacmanCloseByWallShapes = this.map.getCloseByWallShapes(this.pacman.getX(), this.pacman.getY());
 		float ghostClosestNonCollisionX = this.map.getClosestNonCollisionX(this.ghost.getX());
 		float ghostClosestNonCollisionY = this.map.getClosestNonCollisionY(this.ghost.getY());
+		float pacmanClosestNonCollisionX = this.map.getClosestNonCollisionX(this.pacman.getX());
+		float pacmanClosestNonCollisionY = this.map.getClosestNonCollisionY(this.pacman.getY());
 		this.ghost.update(
 				delta,
 				closeByWallShapes,
@@ -120,7 +122,7 @@ public class Game extends BasicGame{
 				ghostClosestNonCollisionY,
 				this.pacman.getCenterX(),
 				this.pacman.getCenterY());
-		this.pacman.update(delta, pacmanCloseByWallShapes);
+		this.pacman.update(delta, pacmanCloseByWallShapes,pacmanClosestNonCollisionX, pacmanClosestNonCollisionY);
 	}
 	
 	/**
@@ -147,15 +149,15 @@ public class Game extends BasicGame{
 	/**
 	 * keyReleased method is overridden from BasicGame class, it gets called when a pressed key is released on the keyboard. 
 	 */
-	@Override
-	public void keyReleased(int key, char c) {
-		if (keyMap.containsKey(key)) {
-			Directions keyDirection = keyMap.get(key);
-			if (pacman.getNextDir() == keyDirection) {
-				pacman.setNextDirection(Directions.STILL);
-			}
-		}
-	}
+//	@Override
+//	public void keyReleased(int key, char c) {
+//		if (keyMap.containsKey(key)) {
+//			Directions keyDirection = keyMap.get(key);
+//			if (pacman.getNextDir() == keyDirection) {
+//				pacman.setNextDirection(Directions.STILL);
+//			}
+//		}
+//	}
 	
 	/**
 	 * Populates available key controls to controlKeys int array. Currently, we only allow up, down, left, right.
