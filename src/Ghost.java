@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Random;
 
+import org.lwjgl.Sys;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -29,26 +31,32 @@ public class Ghost {
 
 	private float x;
 	private float y;
-	private Directions dir;	
+	private Directions dir;
 	private float speed;
 	private boolean isColliding = false;
+
+	private float pacmanCenterX;
+	private float pacmanCenterY;
 		
-	public Ghost(float x, float y, float elementPixelUnit, boolean isDebug) {
+	public Ghost(float initialX, float initialY, float elementPixelUnit, boolean isDebug) {
 		this.isDebug = isDebug;
 
-		this.x = x;
-		this.y = y;
+		this.x = initialX;
+		this.y = initialY;
 		this.elementPixelUnit = elementPixelUnit;
 
 		// The radius of the ghost circle is slightly smaller than 1/2 of the path width to avoid triggering collision
 		// when moving in the path.
-		this.ghostCircleRadius = (float) ((elementPixelUnit / 2) * 0.90);
+		this.ghostCircleRadius = (float) ((elementPixelUnit / 2) * 0.99);
 	}
 
-	public void init() {
+	public void init(float pacmanCenterX, float pacmanCenterY) {
 		try {
 			this.speed = 1;
 			this.dir = Directions.RIGHT;
+
+			this.pacmanCenterX = pacmanCenterX;
+			this.pacmanCenterY = pacmanCenterY;
 
 			SpriteSheet whiteGhostLeftSpriteSheet = new SpriteSheet("images/ghosts/white/white_up.png", 52, 52);
 			this.ghostLeftAminition = new Animation(whiteGhostLeftSpriteSheet, 200);
@@ -76,8 +84,13 @@ public class Ghost {
 			int delta,
 			ArrayList<Shape> closeByWallShapes,
 			float closestNonCollisionX,
-			float closestNonCollisionY
+			float closestNonCollisionY,
+			float pacmanCenterX,
+			float pacmanCenterY
 	) {
+		this.pacmanCenterX = pacmanCenterX;
+		this.pacmanCenterY = pacmanCenterY;
+
 		this.setWallShapesAroundGhost(closeByWallShapes);
 		this.closestNonCollisionX = closestNonCollisionX;
 		this.closestNonCollisionY = closestNonCollisionY;
@@ -116,8 +129,12 @@ public class Ghost {
 	// TODO: This needs to be updated to be more intelligent
 	private void smartMovePerFrame() {
 		if (this.isColliding) {
-			this.reverseDirection();
 			this.replaceGhostToPathCenter();
+			try {
+				this.dir = this.getChosenNextDirection();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		else {
 			this.movePerFrame();
@@ -132,7 +149,7 @@ public class Ghost {
 		this.y = this.closestNonCollisionY;
 	}
 
-	private void movePerFrame(){
+	private void movePerFrame() {
 		switch (this.dir) {
 			case UP:
 				this.y = this.y - this.speed;
@@ -149,21 +166,192 @@ public class Ghost {
 		}
 	}
 
-	private void reverseDirection() {
-		switch (this.dir) {
-			case UP:
-				this.dir = Directions.DOWN;
-				break;
-			case DOWN:
-				this.dir = Directions.UP;
-				break;
-			case LEFT:
-				this.dir = Directions.RIGHT;
-				break;
-			case RIGHT:
-				this.dir = Directions.LEFT;
-				break;
+	private Directions getChosenNextDirection() throws Exception {
+		ArrayList<Directions> availableDirections = this.getAvailableDirections();
+
+		if (availableDirections.size() == 0) {
+			throw new Exception("availableDirections array list cannot be empty");
 		}
+
+		// Unless ghost and pacman are on the same path,
+		// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
+		//if (availableDirections.size() > 1) {
+		//	availableDirections.removeIf(d -> d == (this.getReverseDirection(this.dir)));
+		//}
+
+		float ghostCircleX = this.ghostCircle.getCenterX();
+		float ghostCircleY = this.ghostCircle.getCenterY();
+
+		// get the maximum shortestResultingDistance value possible with one speed value on each of x and y.
+		float shortestResultingDistance =
+				this.getDistanceBetweenTwoPoints(ghostCircleX, ghostCircleY, this.pacmanCenterX, this.pacmanCenterY) +
+				this.getDistanceBetweenTwoPoints(0, 0, this.speed, this.speed);
+		Directions chosenDirection = availableDirections.get(0);
+
+		float newDistance = 0;
+
+		for (Directions currentDir : availableDirections) {
+			System.out.println("CurrentDir: " + this.dir);
+			switch (currentDir) {
+				case UP:
+					// Unless ghost and pacman are on the same path,
+					// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
+					if (availableDirections.size() > 1 && !this.getOnSameVerticalPathWithPacman() && this.getReverseDirection(this.dir) == Directions.UP) {
+						System.out.println("Up removed");
+						break;
+					}
+					newDistance = this.getDistanceBetweenTwoPoints(
+							ghostCircleX,
+							ghostCircleY - this.speed,
+							this.pacmanCenterX,
+							this.pacmanCenterY
+					);
+					if (newDistance < shortestResultingDistance) {
+						shortestResultingDistance = newDistance;
+						chosenDirection = currentDir;
+					}
+					break;
+				case DOWN:
+					// Unless ghost and pacman are on the same path,
+					// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
+					if (availableDirections.size() > 1 && !this.getOnSameVerticalPathWithPacman() && this.getReverseDirection(this.dir) == Directions.DOWN) {
+						System.out.println("Down removed");
+						break;
+					}
+					newDistance = this.getDistanceBetweenTwoPoints(
+							ghostCircleX,
+							ghostCircleY + this.speed,
+							this.pacmanCenterX,
+							this.pacmanCenterY
+					);
+					if (newDistance < shortestResultingDistance) {
+						shortestResultingDistance = newDistance;
+						chosenDirection = currentDir;
+					}
+					break;
+				case LEFT:
+					// Unless ghost and pacman are on the same path,
+					// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
+					if (availableDirections.size() > 1 && !this.getOnSameHorizontalPathWithPacman() && this.getReverseDirection(this.dir) == Directions.LEFT) {
+						System.out.println("Left removed");
+						break;
+					}
+					newDistance = this.getDistanceBetweenTwoPoints(
+							ghostCircleX - this.speed,
+							ghostCircleY,
+							this.pacmanCenterX,
+							this.pacmanCenterY
+					);
+					if (newDistance < shortestResultingDistance) {
+						shortestResultingDistance = newDistance;
+						chosenDirection = currentDir;
+					}
+					break;
+
+				case RIGHT:
+					// Unless ghost and pacman are on the same path,
+					// ghosts do not repeat the immediate path if possible to avoid ghosts being stuck back and forth on one path.
+					if (availableDirections.size() > 1 && !this.getOnSameHorizontalPathWithPacman() && this.getReverseDirection(this.dir) == Directions.RIGHT) {
+						System.out.println("Right removed");
+						break;
+					}
+					newDistance = this.getDistanceBetweenTwoPoints(
+							ghostCircleX + this.speed,
+							ghostCircleY,
+							this.pacmanCenterX,
+							this.pacmanCenterY
+					);
+					if (newDistance < shortestResultingDistance) {
+						shortestResultingDistance = newDistance;
+						chosenDirection = currentDir;
+					}
+					break;
+			}
+		}
+
+		return chosenDirection;
+	}
+
+	private boolean getOnSameHorizontalPathWithPacman() {
+		boolean onSameHorizontalPathWithPacman =
+				Math.abs(this.pacmanCenterY - this.ghostCircle.getCenterY()) < this.elementPixelUnit / 3;
+		System.out.println("this.pacmanCenterY: " + this.pacmanCenterY);
+		System.out.println("this.ghostCircle.getCenterY(): " + this.ghostCircle.getCenterY());
+		System.out.println("onSameHorizontalPathWithPacman: " + onSameHorizontalPathWithPacman);
+		return onSameHorizontalPathWithPacman;
+	}
+
+	private boolean getOnSameVerticalPathWithPacman() {
+		boolean onSameVerticalPathWithPacman =
+				Math.abs(this.pacmanCenterX - this.ghostCircle.getCenterX()) < this.elementPixelUnit / 3;
+		//System.out.println("onSameVerticalPathWithPacman: " + onSameVerticalPathWithPacman);
+		return onSameVerticalPathWithPacman;
+	}
+
+	private Directions getReverseDirection(Directions dir) {
+		switch (dir) {
+			case UP:
+				return Directions.DOWN;
+			case DOWN:
+				return Directions.UP;
+			case LEFT:
+				return Directions.RIGHT;
+			case RIGHT:
+				return Directions.LEFT;
+			case STILL:
+				return Directions.STILL;
+		}
+
+		// Should never get here with a valid direction
+		return Directions.STILL;
+	}
+
+	private float getDistanceBetweenTwoPoints(float x1, float y1, float x2, float y2) {
+		return (float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
+	}
+
+	// This method creates a temporary ghost circle that is placed one radius distance more than the
+	// current actual ghost circle for each of the four directions. Then it populates available directions for those
+	// that do not cause a collision between the temporary ghost circle and the wallShapesAroundGhost.
+	private ArrayList<Directions> getAvailableDirections() {
+		ArrayList<Directions> availableDirections = new ArrayList<>();
+
+		float currentCircleCenterX = this.x + this.elementPixelUnit / 2;
+		float currentCircleCenterY = this.y + this.elementPixelUnit / 2;
+
+		Circle tempGhostCircle = new Circle(
+				currentCircleCenterX,
+				currentCircleCenterY,
+				this.ghostCircleRadius);
+
+		// LEFT
+		tempGhostCircle.setCenterX(currentCircleCenterX - this.ghostCircleRadius);
+		tempGhostCircle.setCenterY(currentCircleCenterY);
+		if (!this.wallShapesAroundGhost.stream().anyMatch(w -> tempGhostCircle.intersects(w))) {
+			availableDirections.add(Directions.LEFT);
+		}
+
+		// RIGHT
+		tempGhostCircle.setCenterX(currentCircleCenterX + this.ghostCircleRadius);
+		tempGhostCircle.setCenterY(currentCircleCenterY);
+		if (!this.wallShapesAroundGhost.stream().anyMatch(w -> tempGhostCircle.intersects(w))) {
+			availableDirections.add(Directions.RIGHT);
+		}
+		// UP
+		tempGhostCircle.setCenterX(currentCircleCenterX);
+		tempGhostCircle.setCenterY(currentCircleCenterY - this.ghostCircleRadius);
+		if (!this.wallShapesAroundGhost.stream().anyMatch(w -> tempGhostCircle.intersects(w))) {
+			availableDirections.add(Directions.UP);
+		}
+		// DOWN
+		tempGhostCircle.setCenterX(currentCircleCenterX);
+		tempGhostCircle.setCenterY(currentCircleCenterY + this.ghostCircleRadius);
+		if (!this.wallShapesAroundGhost.stream().anyMatch(w -> tempGhostCircle.intersects(w))) {
+			availableDirections.add(Directions.DOWN);
+		}
+
+		System.out.println(availableDirections);
+		return availableDirections;
 	}
 
 	public float getX() {

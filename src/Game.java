@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Input;
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.Graphics;
 
@@ -82,7 +82,9 @@ public class Game extends BasicGame{
 	@Override
 	public void init(GameContainer gameContainer) {
 		this.map.init();
-		this.ghost.init();
+
+		//TODO: update this to be the accurate pacman position
+		this.ghost.init(50, 50);
 	}
 	
 	/**
@@ -95,7 +97,13 @@ public class Game extends BasicGame{
 		ArrayList<Shape> closeByWallShapes = this.map.getCloseByWallShapes(this.ghost.getX(), this.ghost.getY());
 		float ghostClosestNonCollisionX = this.map.getClosestNonCollisionX(this.ghost.getX());
 		float ghostClosestNonCollisionY = this.map.getClosestNonCollisionY(this.ghost.getY());
-		this.ghost.update(delta, closeByWallShapes, ghostClosestNonCollisionX, ghostClosestNonCollisionY);
+		this.ghost.update(
+				delta,
+				closeByWallShapes,
+				ghostClosestNonCollisionX,
+				ghostClosestNonCollisionY,
+				Mouse.getX(),
+				this.gameWindowHeight - Mouse.getY());
 		
 	}
 	
