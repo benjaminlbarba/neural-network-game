@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
@@ -23,6 +24,11 @@ public class Ghost {
 	private static final int ghostSpriteWidth = 52;
 	private static final int ghostAnimationSpriteDuration = 200;
 
+	// This is a difficulty setting. Ghost knows the best path at intersections
+	// (we are not concerned about the end of a path when collision happens), by setting this chance lower, ghosts do
+	// do not easily crowd up around the pacman to end the game.
+	private static final float ghostChanceOfPickingCorrectPathAtIntersection = 0.5f;
+
 	private float ghostCircleRadius;
 
 	private float elementPixelUnit;
@@ -37,7 +43,8 @@ public class Ghost {
 	private float y;
 	private Directions dir;
 	private float speed;
-	private boolean isColliding = false;
+	private boolean isAtIntersection = false;
+	private boolean isCollidingWithWall = false;
 
 	private float pacmanCenterX;
 	private float pacmanCenterY;
@@ -79,28 +86,28 @@ public class Ghost {
 					ghostSpriteWidth,
 					ghostSpriteHeight
 			);
-			Animation upAnimation = new Animation(upSpriteSheet, this.ghostAnimationSpriteDuration);
+			Animation upAnimation = new Animation(upSpriteSheet, ghostAnimationSpriteDuration);
 
 			SpriteSheet downSpriteSheet = new SpriteSheet(
 					this.getGhostSpriteFolderLink(this.ghostColor, Directions.DOWN),
 					ghostSpriteWidth,
 					ghostSpriteHeight
 			);
-			Animation downAnimation = new Animation(downSpriteSheet, this.ghostAnimationSpriteDuration);
+			Animation downAnimation = new Animation(downSpriteSheet, ghostAnimationSpriteDuration);
 
 			SpriteSheet leftSpriteSheet = new SpriteSheet(
 					this.getGhostSpriteFolderLink(this.ghostColor, Directions.LEFT),
 					ghostSpriteWidth,
 					ghostSpriteHeight
 			);
-			Animation leftAnimation = new Animation(leftSpriteSheet, this.ghostAnimationSpriteDuration);
+			Animation leftAnimation = new Animation(leftSpriteSheet, ghostAnimationSpriteDuration);
 
 			SpriteSheet rightSpriteSheet = new SpriteSheet(
 					this.getGhostSpriteFolderLink(this.ghostColor, Directions.RIGHT),
 					ghostSpriteWidth,
 					ghostSpriteHeight
 			);
-			Animation rightAnimation = new Animation(rightSpriteSheet, this.ghostAnimationSpriteDuration);
+			Animation rightAnimation = new Animation(rightSpriteSheet, ghostAnimationSpriteDuration);
 
 			this.ghostAnimations.put(Directions.UP, upAnimation);
 			this.ghostAnimations.put(Directions.DOWN, downAnimation);
@@ -141,7 +148,7 @@ public class Ghost {
 
 		this.ghostAnimations.values().forEach(animation -> animation.update(delta));
 		this.updateGhostCirclePosition();
-		this.setIsColliding();
+		this.setIsAtIntersectionAndCollidingWithWall();
 		this.smartMovePerFrame();
 	}
 	
@@ -152,11 +159,11 @@ public class Ghost {
 			g.draw(this.ghostCircle);
 		}
 
-		if (this.isColliding) {
-			g.drawString("GhostCollision: true", 50, 50);
+		if (this.isAtIntersection) {
+			g.drawString("GhostAtIntersection: true", 50, 50);
 		}
 		else {
-			g.drawString("GhostCollision: false", 50, 50);
+			g.drawString("GhostAtIntersection: false", 50, 50);
 		}
 	}
 	
@@ -172,7 +179,7 @@ public class Ghost {
 
 	// TODO: This needs to be updated to be more intelligent
 	private void smartMovePerFrame() {
-		if (this.isColliding) {
+		if (this.isAtIntersection) {
 			this.replaceGhostToPathCenter();
 			try {
 				this.dir = this.getChosenNextDirection();
@@ -180,9 +187,7 @@ public class Ghost {
 				e.printStackTrace();
 			}
 		}
-		else {
-			this.movePerFrame();
-		}
+		this.movePerFrame();
 	}
 
 	// When collision is detected, the ghost circle would already be slightly off the center of its path.
@@ -211,7 +216,7 @@ public class Ghost {
 	}
 
 	private Directions getChosenNextDirection() throws Exception {
-		ArrayList<Directions> availableDirections = this.getAvailableDirections();
+		ArrayList<Directions> availableDirections = this.getAvailableDirections(this.x, this.y);
 
 		if (availableDirections.size() == 0) {
 			throw new Exception("availableDirections array list cannot be empty");
@@ -308,7 +313,18 @@ public class Ghost {
 			}
 		}
 
-		return chosenDirection;
+		return this.randomlyDecideKeepingCurrentDirectionAtIntersection(this.dir, chosenDirection);
+	}
+
+	// Generates 50% change of ghost ignoring the more optimal direction at intersections to avoid making the game
+	// unplayable (because the ghosts are too smart to corner the pacman).
+	private Directions randomlyDecideKeepingCurrentDirectionAtIntersection(Directions currentDir, Directions chosenNextDir) {
+		if (!this.isCollidingWithWall && this.isAtIntersection) {
+			Random random = new Random();
+			return random.nextDouble() <= this.ghostChanceOfPickingCorrectPathAtIntersection ? chosenNextDir : currentDir;
+		}
+
+		return chosenNextDir;
 	}
 
 	private boolean getOnSameHorizontalPathWithPacman() {
@@ -348,11 +364,11 @@ public class Ghost {
 	// This method creates a temporary ghost circle that is placed one radius distance more than the
 	// current actual ghost circle for each of the four directions. Then it populates available directions for those
 	// that do not cause a collision between the temporary ghost circle and the wallShapesAroundGhost.
-	private ArrayList<Directions> getAvailableDirections() {
+	private ArrayList<Directions> getAvailableDirections(float x, float y) {
 		ArrayList<Directions> availableDirections = new ArrayList<>();
 
-		float currentCircleCenterX = this.x + this.elementPixelUnit / 2;
-		float currentCircleCenterY = this.y + this.elementPixelUnit / 2;
+		float currentCircleCenterX = x + this.elementPixelUnit / 2;
+		float currentCircleCenterY = y + this.elementPixelUnit / 2;
 
 		Circle tempGhostCircle = new Circle(
 				currentCircleCenterX,
@@ -396,14 +412,28 @@ public class Ghost {
 		return this.y;
 	}
 	
-	public void setIsColliding() {
+	public void setIsAtIntersectionAndCollidingWithWall() {
+		// if ghost circle is colliding with any wall, it definitely is at intersection.
 		for (Shape wall : this.wallShapesAroundGhost) {
 			if (this.ghostCircle.intersects(wall)) {
-				this.isColliding = true;
+				this.isAtIntersection = true;
+				this.isCollidingWithWall = true;
 				return;
 			}
 		}
-		this.isColliding = false;
+
+		// if the ghost is close enough to a nearest non collision location (path center) and the ghost temp circle
+		// (placed at the nearest path center) has more than 2 available directions
+		// (more than current direction and its reverse), it is also at intersection.
+		if (Math.abs(this.closestNonCollisionX - this.x) < this.speed &&
+				Math.abs(this.closestNonCollisionY - this.y) < this.speed &&
+				this.getAvailableDirections(this.closestNonCollisionX, this.closestNonCollisionY).size() > 2) {
+			this.isAtIntersection = true;
+			return;
+		}
+
+		this.isAtIntersection = false;
+		this.isCollidingWithWall = false;
 	}
 
 	private void setWallShapesAroundGhost(ArrayList<Shape> wallShapesAroundGhost) {

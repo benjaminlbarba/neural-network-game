@@ -41,9 +41,9 @@ public class Pacman {
 
 	public Pacman(float x, float y, float elementPixelUnit, Map m, boolean isDebug) {
 		this.x = x;
-		System.out.println("x="+x);
+		//System.out.println("x="+x);
 		this.y = y;
-		System.out.println("y="+y);
+		//System.out.println("y="+y);
 		this.map = m;
 		this.dir = Directions.STILL;
 		this.isDebug = isDebug;
@@ -132,7 +132,7 @@ public class Pacman {
 	 * @return boolean whether next position is accessible given dir.
 	 */
 	private boolean dirMovable(Directions dir) {
-		System.out.println(dir);
+		//System.out.println(dir);
 		float nextX = x + elementPixelUnit * dirMapX.get(dir);
 		float nextY = y + elementPixelUnit * dirMapY.get(dir);
 		this.pacmanCircle.setCenterX(nextX + this.elementPixelUnit / 2);
@@ -149,11 +149,11 @@ public class Pacman {
 	 * @return boolean is at cell center
 	 */
 	public boolean isAtCellCenter(float x, float y) {
-		System.out.println(Math.round(x) + "," + Math.round(y));
-		System.out.println(Math.round(map.getClosestNonCollisionX(x))+","+Math.round(map.getClosestNonCollisionY(y)));
+		//System.out.println(Math.round(x) + "," + Math.round(y));
+		//System.out.println(Math.round(map.getClosestNonCollisionX(x))+","+Math.round(map.getClosestNonCollisionY(y)));
 		boolean b = (Math.round(x) == Math.round(map.getClosestNonCollisionX(x))) &&
 				(Math.round(y) == Math.round(map.getClosestNonCollisionY(y)));
-		System.out.println(b);
+		//System.out.println(b);
 		return b;
 	}
 
@@ -191,7 +191,7 @@ public class Pacman {
 	}
 
 	private void updatePosition() {
-		System.out.println("updatePosition"+dir);
+		//System.out.println("updatePosition"+dir);
 		if (dir != Directions.STILL) {
 			x += dirMapX.get(dir) * stepSize;
 			y += dirMapY.get(dir) * stepSize;
