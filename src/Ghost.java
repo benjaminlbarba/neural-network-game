@@ -1,7 +1,11 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.sun.tools.javac.util.List;
+import org.lwjgl.Sys;
+import org.lwjgl.util.Timer;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -17,8 +21,11 @@ import org.newdawn.slick.geom.Shape;
  */
 public class Ghost {
 	private boolean isDebug;
+	private Timer timer = new Timer();
 
 	private GhostColors ghostColor;
+	// Each ghost on the map to have slightly different time to be activated to avoid movement overlapping
+	private float ghostStartDelay;
 	private HashMap<Directions, Animation> ghostAnimations = new HashMap<>();
 	private static final int ghostSpriteHeight = 52;
 	private static final int ghostSpriteWidth = 52;
@@ -27,7 +34,7 @@ public class Ghost {
 	// This is a difficulty setting. Ghost knows the best path at intersections
 	// (we are not concerned about the end of a path when collision happens), by setting this chance lower, ghosts do
 	// do not easily crowd up around the pacman to end the game.
-	private static final float ghostChanceOfPickingCorrectPathAtIntersection = 0.3f;
+	private static final float ghostChanceOfPickingCorrectPathAtIntersection = 0.5f;
 
 	private float ghostCircleRadius;
 
@@ -42,7 +49,7 @@ public class Ghost {
 	private float x;
 	private float y;
 	private Directions dir;
-	private float speed;
+	private final float speed = 1;
 	private boolean isAtIntersection = false;
 	private boolean isCollidingWithWall = false;
 
@@ -51,6 +58,7 @@ public class Ghost {
 		
 	public Ghost(float initialX, float initialY, float elementPixelUnit, boolean isDebug, int ghostIndex) {
 		this.ghostColor = this.getGhostColorFromIndex(ghostIndex);
+		this.setGhostStartDelay(ghostIndex);
 		this.isDebug = isDebug;
 
 		this.x = initialX;
@@ -67,9 +75,13 @@ public class Ghost {
 		return availableGhostColors[ghostIndex % (availableGhostColors.length)];
 	}
 
+	// Each ghost start one second after the last ghost
+	private void setGhostStartDelay(int ghostIndex) {
+		this.ghostStartDelay = (float) (ghostIndex * 2);
+	}
+
 	public void init(float pacmanCenterX, float pacmanCenterY) {
-		this.speed = 1;
-		this.dir = Directions.DOWN;
+		this.dir = this.getRandomGhostDir();
 
 		this.pacmanCenterX = pacmanCenterX;
 		this.pacmanCenterY = pacmanCenterY;
@@ -123,6 +135,14 @@ public class Ghost {
 		}
 	}
 
+	private Directions getRandomGhostDir() {
+		Random random = new Random();
+		ArrayList<Directions> availableDirections = new ArrayList<>(Arrays.asList(Directions.values()));
+		availableDirections.removeIf(d -> d.equals(Directions.STILL));
+
+		return availableDirections.get(random.nextInt(availableDirections.size()));
+	}
+
 	private String getGhostSpriteFolderLink(GhostColors color, Directions direction) {
 		String colorString = color.toString().toLowerCase();
 		String directionString = direction.toString().toLowerCase();
@@ -144,6 +164,13 @@ public class Ghost {
 			float pacmanCenterX,
 			float pacmanCenterY
 	) {
+		this.ghostAnimations.values().forEach(animation -> animation.update(delta));
+
+		// Do not start moving the ghost until its time is up.
+		if (this.timer.getTime() < this.ghostStartDelay) {
+			return;
+		}
+
 		this.pacmanCenterX = pacmanCenterX;
 		this.pacmanCenterY = pacmanCenterY;
 
@@ -151,10 +178,11 @@ public class Ghost {
 		this.closestNonCollisionX = closestNonCollisionX;
 		this.closestNonCollisionY = closestNonCollisionY;
 
-		this.ghostAnimations.values().forEach(animation -> animation.update(delta));
 		this.updateGhostCirclePosition();
 		this.setIsAtIntersectionAndCollidingWithWall();
 		this.smartMovePerFrame();
+
+		this.timer.tick();
 	}
 	
 	public void render(Graphics g) {
