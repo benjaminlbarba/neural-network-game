@@ -31,7 +31,7 @@ public class Game extends BasicGame{
 	private Map map;
 	private Pacman pacman;
 	// For the initial implementation, we are just implementing one ghost. After the basic game is created, we will set up more ghosts.
-	private Ghost ghost;
+	private ArrayList<Ghost> ghosts = new ArrayList<>();
 
 	public Game(String title, int gameWindowWidth, int gameWindowHeight, boolean isDebug) {
 		super(title);
@@ -49,15 +49,23 @@ public class Game extends BasicGame{
 				gameWindowHeight);
 		
 		this.map = new Map(mapData, elementPixelUnit, this.getMapOriginX(), this.getMapOriginY(), isDebug);
-		this.ghost = new Ghost(
-				this.map.getXFromColNumber(this.mapData.ghostStartPointColNumber), 
-				this.map.getYFromRowNumber(this.mapData.ghostStartPointRowNumber), 
-				elementPixelUnit,
-				GhostColors.RED,
-				isDebug);
+
+		RowColTuple[] ghostsOnMap = this.mapData.ghostRowColTuples;
+		for (int i = 0; i < ghostsOnMap.length; i++) {
+			this.ghosts.add(
+					new Ghost(
+							this.map.getXFromColNumber(ghostsOnMap[i].col),
+							this.map.getYFromRowNumber(ghostsOnMap[i].row),
+							this.elementPixelUnit,
+							isDebug,
+							i
+							)
+			);
+		}
+
 		this.pacman = new Pacman(
-				this.map.getXFromColNumber(this.mapData.pacmanStartPointColNumber),
-				this.map.getYFromRowNumber(this.mapData.pacmanStartPointRowNumber),
+				this.map.getXFromColNumber(this.mapData.pacmanRowColTuple.col),
+				this.map.getYFromRowNumber(this.mapData.pacmanRowColTuple.row),
 				elementPixelUnit,
 				map,
 				isDebug);
@@ -99,7 +107,7 @@ public class Game extends BasicGame{
 	public void init(GameContainer gameContainer) {
 		this.map.init();
 		this.pacman.init();
-		this.ghost.init(this.pacman.getCenterX(), this.pacman.getCenterY());
+		this.ghosts.forEach(ghost -> ghost.init(this.pacman.getCenterX(), this.pacman.getCenterY()));
 	}
 	
 	/**
@@ -108,22 +116,25 @@ public class Game extends BasicGame{
 	 */
 	@Override
 	public void update(GameContainer container, int delta) {
-		// update for ghost
-		ArrayList<Shape> closeByWallShapes = this.map.getCloseByWallShapes(this.ghost.getX(), this.ghost.getY());
+		// update for pacman
 		ArrayList<Shape> pacmanCloseByWallShapes = this.map.getCloseByWallShapes(this.pacman.getX(), this.pacman.getY());
-
-		float ghostClosestNonCollisionX = this.map.getClosestNonCollisionX(this.ghost.getX());
-		float ghostClosestNonCollisionY = this.map.getClosestNonCollisionY(this.ghost.getY());
 		float pacmanClosestNonCollisionX = this.map.getClosestNonCollisionX(this.pacman.getX());
 		float pacmanClosestNonCollisionY = this.map.getClosestNonCollisionY(this.pacman.getY());
-		this.ghost.update(
-				delta,
-				closeByWallShapes,
-				ghostClosestNonCollisionX,
-				ghostClosestNonCollisionY,
-				this.pacman.getCenterX(),
-				this.pacman.getCenterY());
 		this.pacman.update(delta, pacmanCloseByWallShapes,pacmanClosestNonCollisionX, pacmanClosestNonCollisionY);
+
+		// update for ghosts
+		this.ghosts.forEach(g -> {
+			ArrayList<Shape> closeByWallShapes = this.map.getCloseByWallShapes(g.getX(), g.getY());
+			float ghostClosestNonCollisionX = this.map.getClosestNonCollisionX(g.getX());
+			float ghostClosestNonCollisionY = this.map.getClosestNonCollisionY(g.getY());
+			g.update(
+					delta,
+					closeByWallShapes,
+					ghostClosestNonCollisionX,
+					ghostClosestNonCollisionY,
+					this.pacman.getCenterX(),
+					this.pacman.getCenterY());
+		});
 	}
 	
 	/**
@@ -133,7 +144,7 @@ public class Game extends BasicGame{
 	@Override
 	public void render(GameContainer container, Graphics g) {
 		this.map.render(g);
-		this.ghost.render(g);
+		this.ghosts.forEach(ghost -> ghost.render(g)); ;
 		this.pacman.render(g);
 	}
 	

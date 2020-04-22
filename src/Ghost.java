@@ -27,7 +27,7 @@ public class Ghost {
 	// This is a difficulty setting. Ghost knows the best path at intersections
 	// (we are not concerned about the end of a path when collision happens), by setting this chance lower, ghosts do
 	// do not easily crowd up around the pacman to end the game.
-	private static final float ghostChanceOfPickingCorrectPathAtIntersection = 0.5f;
+	private static final float ghostChanceOfPickingCorrectPathAtIntersection = 0.3f;
 
 	private float ghostCircleRadius;
 
@@ -49,8 +49,8 @@ public class Ghost {
 	private float pacmanCenterX;
 	private float pacmanCenterY;
 		
-	public Ghost(float initialX, float initialY, float elementPixelUnit, GhostColors ghostColor, boolean isDebug) {
-		this.ghostColor = ghostColor;
+	public Ghost(float initialX, float initialY, float elementPixelUnit, boolean isDebug, int ghostIndex) {
+		this.ghostColor = this.getGhostColorFromIndex(ghostIndex);
 		this.isDebug = isDebug;
 
 		this.x = initialX;
@@ -60,6 +60,11 @@ public class Ghost {
 		// The radius of the ghost circle is slightly smaller than 1/2 of the path width to avoid triggering collision
 		// when moving in the path.
 		this.ghostCircleRadius = (float) ((elementPixelUnit / 2) * 0.99);
+	}
+
+	private GhostColors getGhostColorFromIndex(int ghostIndex) {
+		GhostColors[] availableGhostColors = GhostColors.values();
+		return availableGhostColors[ghostIndex % (availableGhostColors.length)];
 	}
 
 	public void init(float pacmanCenterX, float pacmanCenterY) {

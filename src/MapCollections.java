@@ -36,17 +36,23 @@ public class MapCollections {
 				{'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'}
 			},
 		};
-	private static int[] pacmanStartPointRowNumbers = {1, 1, 1};
-	private static int[] pacmanStartPointColNumbers = {1, 1, 1};
-	private static int[] ghostStartPointRowNumbers = {1, 1, 1};
-	private static int[] ghostStartPointColNumbers = {4, 4, 8};
-	
+
+	private static final RowColTuple[] pacmanRowColTupleArray = {
+			new RowColTuple(1, 1),
+			new RowColTuple(1, 1),
+			new RowColTuple(1, 1)};
+
+	// Each map hosts more than one ghost
+	private static final RowColTuple[][] ghostRowColTuplesArrary = {
+			{new RowColTuple(1, 3), new RowColTuple(1, 4)},
+			{new RowColTuple(1, 3), new RowColTuple(1, 4)},
+			{new RowColTuple(4, 9), new RowColTuple(4, 10), new RowColTuple(4, 11), new RowColTuple(4, 12)}
+	};
+
 	public static MapData getMapData(int index) {
 		return new MapData(
-				pacmanStartPointRowNumbers[index],
-				pacmanStartPointColNumbers[index],
-				ghostStartPointRowNumbers[index],
-				ghostStartPointColNumbers[index], 
+				pacmanRowColTupleArray[index],
+				ghostRowColTuplesArrary[index],
 				mapsArray[index]);
 	}
 }
