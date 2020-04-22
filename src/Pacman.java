@@ -49,9 +49,7 @@ public class Pacman {
 
     public Pacman(float x, float y, float elementPixelUnit, Map m, boolean isDebug) {
         this.x = x;
-        //System.out.println("x="+x);
         this.y = y;
-        //System.out.println("y="+y);
         this.map = m;
         this.dir = Directions.STILL;
         this.isDebug = isDebug;
@@ -136,27 +134,23 @@ public class Pacman {
         this.pacmanAnimations.values().forEach(animation -> animation.update(delta));
         this.updatePacmanCirclePosition();
         this.setIsAtIntersectionAndCollidingWithWall();
-        // System.out.println("nextdir:"+nextDir);
+        updatePosition();
+
         if (dirMovable(nextDir)) {
-            //System.out.println("1"+ isColliding);
             dir = nextDir;
         }
-        else if (isAtIntersection) {
-            if (!dirMovable(dir)) {
-//                System.out.println("2"+ isColliding);
-//                System.out.println("2dir"+ dir);
-//                System.out.println("2nextdir"+ nextDir);
+        else if (isAtIntersection && isColliding) {
+            replaceGhostToPathCenter();
+            if (!dirMovable(dir) && !dirMovable(nextDir)) {
                 nextDir = Directions.STILL;
                 dir = nextDir;
             }
             // dir remain unchanged if at intersection, nextDir unmovable and dir movable.
         }
-        updatePosition();
     }
 
 
     public void render(Graphics g) {
-//        System.out.println("draw:" + dir);
         this.pacmanAnimations.get(this.dir).draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
         if (isDebug) {
             g.draw(this.pacmanCircle);
@@ -171,20 +165,14 @@ public class Pacman {
      * @see Directions
      */
     private boolean dirMovable(Directions d) {
-        //System.out.println(d);
         float nextX = x + elementPixelUnit * dirMapX.get(d);
-        //System.out.println("x:"+x);
-        //System.out.println("nextx:"+nextX);
         float nextY = y + elementPixelUnit * dirMapY.get(d);
-        //System.out.println("y:"+y);
-        //System.out.println("nexty:"+nextY);
+
         this.pacmanCircle.setCenterX(nextX + this.elementPixelUnit / 2);
         this.pacmanCircle.setCenterY(nextY + this.elementPixelUnit / 2);
-        setIsColliding();
-        //System.out.println(isColliding);
-        //System.out.println("------------------");
+        boolean isNextPositionPacmanCircleColliding = this.getIsCollidingWithCircle(this.pacmanCircle);
         updatePacmanCirclePosition();
-        return !isColliding;
+        return !isNextPositionPacmanCircleColliding;
     }
 
     /**
@@ -224,14 +212,21 @@ public class Pacman {
         this.wallShapesAroundPacman = wallShapesAroundPacman;
     }
 
-    public void setIsColliding() {
+    // When collision is detected, the pacman circle would already be slightly off the center of its path.
+    // This method moves it back to the center, resets its position to be right before the collision so that the
+    // collision state is clear and the pacman could change direction.
+    private void replaceGhostToPathCenter() {
+        this.x = this.closestNonCollisionX;
+        this.y = this.closestNonCollisionY;
+    }
+
+    public boolean getIsCollidingWithCircle(Circle circle) {
         for (Shape wall : this.wallShapesAroundPacman) {
-            if (this.pacmanCircle.intersects(wall)) {
-                this.isColliding = true;
-                return;
+            if (circle.intersects(wall)) {
+                return true;
             }
         }
-        this.isColliding = false;
+        return false;
     }
 
     public void setIsAtIntersectionAndCollidingWithWall() {
@@ -258,7 +253,6 @@ public class Pacman {
 
 
     private void updatePosition() {
-//		System.out.println("updatePosition"+dir);
         if (dir != Directions.STILL) {
             x += dirMapX.get(dir) * stepSize;
             y += dirMapY.get(dir) * stepSize;

@@ -165,7 +165,7 @@ public class Game extends BasicGame{
 	@Override
 	public void keyPressed(int key, char c) {
 		if (keyMap.containsKey(key)) {
-			pacman.setNextDirection(keyMap.get(key));
+			this.pacman.setNextDirection(keyMap.get(key));
 		}
 	}
 	
