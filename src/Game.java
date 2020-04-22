@@ -135,6 +135,10 @@ public class Game extends BasicGame{
 					this.pacman.getCenterX(),
 					this.pacman.getCenterY());
 		});
+		
+		// update for map
+		int scoreAdded = this.map.update(this.pacman.getX(), this.pacman.getY());
+		this.score.addScore(scoreAdded);
 	}
 	
 	/**
@@ -146,6 +150,7 @@ public class Game extends BasicGame{
 		this.map.render(g);
 		this.ghosts.forEach(ghost -> ghost.render(g)); ;
 		this.pacman.render(g);
+		this.score.render(g);
 	}
 	
 	/**

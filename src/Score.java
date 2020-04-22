@@ -1,3 +1,5 @@
+import org.newdawn.slick.Graphics;
+
 /**
  * Score is the class that initializes the score in the game, keeps track of it, and display it on the game window.
  */
@@ -16,6 +18,14 @@ public class Score {
 	
 	public void setScore(int score) {
 		this.score = score;
+	}
+	
+	public void addScore(int scoreAdded) {
+		this.score += scoreAdded;
+	}
+	
+	public void render(Graphics g) {
+		g.drawString("Score: " + score, 50, 150);
 	}
 
 }

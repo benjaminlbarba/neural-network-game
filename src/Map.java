@@ -74,7 +74,33 @@ public class Map {
 	 * update method here gets called in the update method in Game class.
 	 * It updates the positions of the dots on the map as well as the count of the remaining dots.
 	 */
-	public void update() {
+	public int update(float pacmanX, float pacmanY) {
+		int rowNum = -1;
+		int colNum = -1;
+		for (int i = 0; i < this.mapDataRowCount; i++) {
+			float y = this.getYFromRowNumber(i);
+			if (Math.abs(y - pacmanY) < 5) {
+				rowNum = i;
+			}
+		}
+		for (int j = 0; j < this.mapDataColCount; j++) {
+			float x = this.getXFromColNumber(j);
+			if (Math.abs(x - pacmanX) < 5) {
+				colNum = j;
+			}
+		}
+		if (rowNum == -1 || colNum == -1) {
+			return 0;
+		}
+		if (mapData.mapArray[rowNum][colNum] == '.') {
+			mapData.mapArray[rowNum][colNum] = ' ';
+			return 10;
+		}
+		if (mapData.mapArray[rowNum][colNum] == '*') {
+			mapData.mapArray[rowNum][colNum] = ' ';
+			return 100;
+		}
+		return 0;
 	}
 	
 	/**
