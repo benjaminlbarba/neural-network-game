@@ -42,6 +42,7 @@ public class Ghost {
 	
 	private Circle ghostCircle;
 	private ArrayList<Shape> wallShapesAroundGhost;
+	private Circle pacmanCircle;
 
 	private float closestNonCollisionX;
 	private float closestNonCollisionY;
@@ -52,9 +53,7 @@ public class Ghost {
 	private final float speed = 1;
 	private boolean isAtIntersection = false;
 	private boolean isCollidingWithWall = false;
-
-	private float pacmanCenterX;
-	private float pacmanCenterY;
+	private boolean isCollidingWithPacman = false;
 		
 	public Ghost(float initialX, float initialY, float elementPixelUnit, boolean isDebug, int ghostIndex) {
 		this.ghostColor = this.getGhostColorFromIndex(ghostIndex);
@@ -82,9 +81,6 @@ public class Ghost {
 
 	public void init(float pacmanCenterX, float pacmanCenterY) {
 		this.dir = this.getRandomGhostDir();
-
-		this.pacmanCenterX = pacmanCenterX;
-		this.pacmanCenterY = pacmanCenterY;
 
 		this.initializeGhostAnimations();
 
@@ -161,8 +157,7 @@ public class Ghost {
 			ArrayList<Shape> closeByWallShapes,
 			float closestNonCollisionX,
 			float closestNonCollisionY,
-			float pacmanCenterX,
-			float pacmanCenterY
+			Circle pacmanCircle
 	) {
 		this.ghostAnimations.values().forEach(animation -> animation.update(delta));
 
@@ -171,8 +166,8 @@ public class Ghost {
 			return;
 		}
 
-		this.pacmanCenterX = pacmanCenterX;
-		this.pacmanCenterY = pacmanCenterY;
+		this.pacmanCircle = pacmanCircle;
+		this.setIsCollidingWithPacman();
 
 		this.setWallShapesAroundGhost(closeByWallShapes);
 		this.closestNonCollisionX = closestNonCollisionX;
@@ -190,13 +185,6 @@ public class Ghost {
 		this.ghostAnimations.get(this.dir).draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
 		if (isDebug) {
 			g.draw(this.ghostCircle);
-		}
-
-		if (this.isAtIntersection) {
-			g.drawString("GhostAtIntersection: true", 50, 50);
-		}
-		else {
-			g.drawString("GhostAtIntersection: false", 50, 50);
 		}
 	}
 	
@@ -263,7 +251,12 @@ public class Ghost {
 
 		// get the maximum shortestResultingDistance value possible with one speed value on each of x and y.
 		float shortestResultingDistance =
-				this.getDistanceBetweenTwoPoints(ghostCircleX, ghostCircleY, this.pacmanCenterX, this.pacmanCenterY) +
+				this.getDistanceBetweenTwoPoints(
+						ghostCircleX,
+						ghostCircleY,
+						this.pacmanCircle.getCenterX(),
+						this.pacmanCircle.getCenterY()
+				) +
 				this.getDistanceBetweenTwoPoints(0, 0, this.speed, this.speed);
 		Directions chosenDirection = availableDirections.get(0);
 
@@ -280,8 +273,8 @@ public class Ghost {
 					newDistance = this.getDistanceBetweenTwoPoints(
 							ghostCircleX,
 							ghostCircleY - this.speed,
-							this.pacmanCenterX,
-							this.pacmanCenterY
+							this.pacmanCircle.getCenterX(),
+							this.pacmanCircle.getCenterY()
 					);
 					if (newDistance < shortestResultingDistance) {
 						shortestResultingDistance = newDistance;
@@ -297,8 +290,8 @@ public class Ghost {
 					newDistance = this.getDistanceBetweenTwoPoints(
 							ghostCircleX,
 							ghostCircleY + this.speed,
-							this.pacmanCenterX,
-							this.pacmanCenterY
+							this.pacmanCircle.getCenterX(),
+							this.pacmanCircle.getCenterY()
 					);
 					if (newDistance < shortestResultingDistance) {
 						shortestResultingDistance = newDistance;
@@ -314,8 +307,8 @@ public class Ghost {
 					newDistance = this.getDistanceBetweenTwoPoints(
 							ghostCircleX - this.speed,
 							ghostCircleY,
-							this.pacmanCenterX,
-							this.pacmanCenterY
+							this.pacmanCircle.getCenterX(),
+							this.pacmanCircle.getCenterY()
 					);
 					if (newDistance < shortestResultingDistance) {
 						shortestResultingDistance = newDistance;
@@ -332,8 +325,8 @@ public class Ghost {
 					newDistance = this.getDistanceBetweenTwoPoints(
 							ghostCircleX + this.speed,
 							ghostCircleY,
-							this.pacmanCenterX,
-							this.pacmanCenterY
+							this.pacmanCircle.getCenterX(),
+							this.pacmanCircle.getCenterY()
 					);
 					if (newDistance < shortestResultingDistance) {
 						shortestResultingDistance = newDistance;
@@ -359,13 +352,13 @@ public class Ghost {
 
 	private boolean getOnSameHorizontalPathWithPacman() {
 		boolean onSameHorizontalPathWithPacman =
-				Math.abs(this.pacmanCenterY - this.ghostCircle.getCenterY()) < this.elementPixelUnit / 3;
+				Math.abs(this.pacmanCircle.getCenterY() - this.ghostCircle.getCenterY()) < this.elementPixelUnit / 3;
 		return onSameHorizontalPathWithPacman;
 	}
 
 	private boolean getOnSameVerticalPathWithPacman() {
 		boolean onSameVerticalPathWithPacman =
-				Math.abs(this.pacmanCenterX - this.ghostCircle.getCenterX()) < this.elementPixelUnit / 3;
+				Math.abs(this.pacmanCircle.getCenterX() - this.ghostCircle.getCenterX()) < this.elementPixelUnit / 3;
 		return onSameVerticalPathWithPacman;
 	}
 
@@ -441,8 +434,12 @@ public class Ghost {
 	public float getY() {
 		return this.y;
 	}
-	
-	public void setIsAtIntersectionAndCollidingWithWall() {
+
+	private void setIsCollidingWithPacman() {
+		this.isCollidingWithPacman = this.pacmanCircle.intersects(this.ghostCircle);
+	}
+
+	private void setIsAtIntersectionAndCollidingWithWall() {
 		// if ghost circle is colliding with any wall, it definitely is at intersection.
 		for (Shape wall : this.wallShapesAroundGhost) {
 			if (this.ghostCircle.intersects(wall)) {
@@ -468,5 +465,9 @@ public class Ghost {
 
 	private void setWallShapesAroundGhost(ArrayList<Shape> wallShapesAroundGhost) {
 		this.wallShapesAroundGhost = wallShapesAroundGhost;
+	}
+
+	public boolean getIsCollidingWithPacman() {
+		return this.isCollidingWithPacman;
 	}
 }

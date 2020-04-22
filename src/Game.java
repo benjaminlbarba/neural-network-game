@@ -132,8 +132,8 @@ public class Game extends BasicGame{
 					closeByWallShapes,
 					ghostClosestNonCollisionX,
 					ghostClosestNonCollisionY,
-					this.pacman.getCenterX(),
-					this.pacman.getCenterY());
+					this.pacman.getPacmanCircle()
+			);
 		});
 		
 		// update for map
@@ -148,7 +148,13 @@ public class Game extends BasicGame{
 	@Override
 	public void render(GameContainer container, Graphics g) {
 		this.map.render(g);
-		this.ghosts.forEach(ghost -> ghost.render(g)); ;
+
+		this.ghosts.forEach(ghost -> {
+			ghost.render(g);
+			if (ghost.getIsCollidingWithPacman()) {
+				g.drawString("Pacman hits ghost: true", 50, 50);
+			}
+		});
 		this.pacman.render(g);
 		this.score.render(g);
 	}

@@ -161,12 +161,6 @@ public class Pacman {
         if (isDebug) {
             g.draw(this.pacmanCircle);
         }
-
-        if (this.isColliding) {
-            g.drawString("PacmanCollision: true", 50, 60);
-        } else {
-            g.drawString("PacmanCollision: false", 50, 60);
-        }
     }
 
     /**
@@ -391,5 +385,9 @@ public class Pacman {
      */
     public void setNextDirection(Directions dir) {
         nextDir = dir;
+    }
+
+    public Circle getPacmanCircle() {
+        return this.pacmanCircle;
     }
 }
