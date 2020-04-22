@@ -26,7 +26,7 @@ public class Game extends BasicGame{
 	private Score score;
 	private HashMap<Integer, Directions> keyMap;
 	
-	private MapData mapData = MapCollections.getMapData(2);
+	private MapData mapData = MapCollections.getMapData(1);
 	
 	private Map map;
 	private Pacman pacman;

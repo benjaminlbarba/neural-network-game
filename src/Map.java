@@ -225,5 +225,9 @@ public class Map {
 	private int getClosestRow(float currentY) {
 		return Math.round((currentY - this.mapOriginY) / this.elementPixelUnit);
 	}
+	
+	public MapData getMapdata() {
+		return this.mapData;
+	}
 
 }
