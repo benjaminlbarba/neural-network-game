@@ -33,6 +33,7 @@ public class Pacman {
     private Circle pacmanCircle;
     private float pacmanCircleRadius;
 
+
     private boolean isAtIntersection = false;
 
     private float closestNonCollisionX;
@@ -40,6 +41,7 @@ public class Pacman {
 
     private boolean isDebug;
     private Animation pacmanRightAnimation;
+
     private HashMap<Directions, Integer> dirMapX;
     private HashMap<Directions, Integer> dirMapY;
     private boolean isColliding = false;
@@ -136,9 +138,8 @@ public class Pacman {
 
         if (dirMovable(nextDir)) {
             dir = nextDir;
-        }
-        else if (isAtIntersection && isColliding) {
-            replaceGhostToPathCenter();
+        } else if (isAtIntersection && isColliding) {
+            replacePacmanToPathCenter();
             nextDir = Directions.STILL;
             dir = nextDir;
 
@@ -172,7 +173,7 @@ public class Pacman {
         return !isNextPositionPacmanCircleColliding;
     }
 
-/*    *//**
+    /*    *//**
      * Return boolean whether current coordinate is at cell center.
      *
      * @param x x coordinate
@@ -205,14 +206,14 @@ public class Pacman {
         this.nextDir = nextDir;
     }
 
-    private void setWallShapesAroundPacman(ArrayList<Shape> wallShapesAroundPacman) {
+    public void setWallShapesAroundPacman(ArrayList<Shape> wallShapesAroundPacman) {
         this.wallShapesAroundPacman = wallShapesAroundPacman;
     }
 
     // When collision is detected, the pacman circle would already be slightly off the center of its path.
     // This method moves it back to the center, resets its position to be right before the collision so that the
     // collision state is clear and the pacman could change direction.
-    private void replaceGhostToPathCenter() {
+    public void replacePacmanToPathCenter() {
         this.x = this.closestNonCollisionX;
         this.y = this.closestNonCollisionY;
     }
@@ -249,7 +250,7 @@ public class Pacman {
     }
 
 
-    private void updatePosition() {
+    public void updatePosition() {
         if (dir != Directions.STILL) {
             x += dirMapX.get(dir) * stepSize;
             y += dirMapY.get(dir) * stepSize;
@@ -380,5 +381,17 @@ public class Pacman {
 
     public Circle getPacmanCircle() {
         return this.pacmanCircle;
+    }
+
+    public HashMap<Directions, Integer> getDirMapX() {
+        return dirMapX;
+    }
+
+    public HashMap<Directions, Animation> getPacmanAnimations() {
+        return pacmanAnimations;
+    }
+
+    public boolean getIsAtIntersection() {
+        return isAtIntersection;
     }
 }
