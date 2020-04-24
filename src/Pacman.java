@@ -17,7 +17,6 @@ import java.util.HashMap;
 public class Pacman {
 
     public static final float stepSize = 1; // must be factor of blockSize (length of row and col)
-    private Map map;
     private boolean isAddScore;
     private Directions nextDir;
 
@@ -34,6 +33,7 @@ public class Pacman {
     private Circle pacmanCircle;
     private float pacmanCircleRadius;
 
+
     private boolean isAtIntersection = false;
 
     private float closestNonCollisionX;
@@ -41,16 +41,16 @@ public class Pacman {
 
     private boolean isDebug;
     private Animation pacmanRightAnimation;
+
     private HashMap<Directions, Integer> dirMapX;
     private HashMap<Directions, Integer> dirMapY;
     private boolean isColliding = false;
     private ArrayList<Shape> wallShapesAroundPacman;
 
 
-    public Pacman(float x, float y, float elementPixelUnit, Map m, boolean isDebug) {
+    public Pacman(float x, float y, float elementPixelUnit, boolean isDebug) {
         this.x = x;
         this.y = y;
-        this.map = m;
         this.dir = Directions.STILL;
         this.isDebug = isDebug;
         this.elementPixelUnit = elementPixelUnit;
@@ -61,20 +61,20 @@ public class Pacman {
 
     public void init() {
         try {
-            SpriteSheet pacmanLeftSpriteSheet = new SpriteSheet("images/pacman/pacman_left.jpg", 18, 18);
-            Animation leftAnimation = new Animation(pacmanLeftSpriteSheet, 200);
+            SpriteSheet pacmanLeftSpriteSheet = new SpriteSheet("images/pacman/pacman_left.jpg", 56, 56);
+            Animation leftAnimation = new Animation(pacmanLeftSpriteSheet, 100);
 
-            SpriteSheet pacmanRightSpriteSheet = new SpriteSheet("images/pacman/pacman_right.jpg", 17, 18);
-            Animation rightAnimation = new Animation(pacmanRightSpriteSheet, 200);
+            SpriteSheet pacmanRightSpriteSheet = new SpriteSheet("images/pacman/pacman_right.jpg", 56, 56);
+            Animation rightAnimation = new Animation(pacmanRightSpriteSheet, 100);
 
-            SpriteSheet pacmanUpSpriteSheet = new SpriteSheet("images/pacman/pacman_up.jpg", 18, 14);
-            Animation upAnimation = new Animation(pacmanUpSpriteSheet, 200);
+            SpriteSheet pacmanUpSpriteSheet = new SpriteSheet("images/pacman/pacman_up.jpg", 56, 56);
+            Animation upAnimation = new Animation(pacmanUpSpriteSheet, 100);
 
-            SpriteSheet pacmanDownSpriteSheet = new SpriteSheet("images/pacman/pacman_down.jpg", 18, 16);
-            Animation downAnimation = new Animation(pacmanDownSpriteSheet, 200);
+            SpriteSheet pacmanDownSpriteSheet = new SpriteSheet("images/pacman/pacman_down.jpg", 56, 56);
+            Animation downAnimation = new Animation(pacmanDownSpriteSheet, 100);
 
-            SpriteSheet pacmanStillSpriteSheet = new SpriteSheet("images/pacman/pacman_still.jpg", 21, 19);
-            Animation stillAnimation = new Animation(pacmanStillSpriteSheet, 200);
+            SpriteSheet pacmanStillSpriteSheet = new SpriteSheet("images/pacman/pacman_still.jpg", 56, 56);
+            Animation stillAnimation = new Animation(pacmanStillSpriteSheet, 100);
 
             this.pacmanAnimations.put(Directions.UP, upAnimation);
             this.pacmanAnimations.put(Directions.DOWN, downAnimation);
@@ -138,13 +138,11 @@ public class Pacman {
 
         if (dirMovable(nextDir)) {
             dir = nextDir;
-        }
-        else if (isAtIntersection && isColliding) {
-            replaceGhostToPathCenter();
-            if (!dirMovable(dir) && !dirMovable(nextDir)) {
-                nextDir = Directions.STILL;
-                dir = nextDir;
-            }
+        } else if (isAtIntersection && isColliding) {
+            replacePacmanToPathCenter();
+            nextDir = Directions.STILL;
+            dir = nextDir;
+
             // dir remain unchanged if at intersection, nextDir unmovable and dir movable.
         }
     }
@@ -160,7 +158,7 @@ public class Pacman {
     /**
      * Return whether next position is accessible given dir.
      *
-     * @param dir direction for next position
+     * @param d direction for next position
      * @return boolean whether next position is accessible given dir.
      * @see Directions
      */
@@ -175,18 +173,18 @@ public class Pacman {
         return !isNextPositionPacmanCircleColliding;
     }
 
-    /**
+    /*    *//**
      * Return boolean whether current coordinate is at cell center.
      *
      * @param x x coordinate
      * @param y y coordinate
      * @return boolean is at cell center
-     */
+     *//*
     public boolean isAtCellCenter(float x, float y) {
         boolean b = (Math.round(x) == Math.round(map.getClosestNonCollisionX(x))) &&
                 (Math.round(y) == Math.round(map.getClosestNonCollisionY(y)));
         return b;
-    }
+    }*/
 
     /**
      * This method updates the center x,y of the circle based on the x, y of the pacman animation.
@@ -208,14 +206,14 @@ public class Pacman {
         this.nextDir = nextDir;
     }
 
-    private void setWallShapesAroundPacman(ArrayList<Shape> wallShapesAroundPacman) {
+    public void setWallShapesAroundPacman(ArrayList<Shape> wallShapesAroundPacman) {
         this.wallShapesAroundPacman = wallShapesAroundPacman;
     }
 
     // When collision is detected, the pacman circle would already be slightly off the center of its path.
     // This method moves it back to the center, resets its position to be right before the collision so that the
     // collision state is clear and the pacman could change direction.
-    private void replaceGhostToPathCenter() {
+    public void replacePacmanToPathCenter() {
         this.x = this.closestNonCollisionX;
         this.y = this.closestNonCollisionY;
     }
@@ -252,7 +250,7 @@ public class Pacman {
     }
 
 
-    private void updatePosition() {
+    public void updatePosition() {
         if (dir != Directions.STILL) {
             x += dirMapX.get(dir) * stepSize;
             y += dirMapY.get(dir) * stepSize;
@@ -383,5 +381,17 @@ public class Pacman {
 
     public Circle getPacmanCircle() {
         return this.pacmanCircle;
+    }
+
+    public HashMap<Directions, Integer> getDirMapX() {
+        return dirMapX;
+    }
+
+    public HashMap<Directions, Animation> getPacmanAnimations() {
+        return pacmanAnimations;
+    }
+
+    public boolean getIsAtIntersection() {
+        return isAtIntersection;
     }
 }
