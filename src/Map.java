@@ -56,7 +56,7 @@ public class Map {
 	}
 	
 	/**
-	 * init method here gets called in the init method in Game class. 
+	 * init method here gets called in the init method in MainGameState class.
 	 * It initiates the display of the map and dots.
 	 */
 	public void init() {
@@ -71,7 +71,7 @@ public class Map {
 	}
 
 	/**
-	 * update method here gets called in the update method in Game class.
+	 * update method here gets called in the update method in MainGameState class.
 	 * It updates the positions of the dots on the map as well as the count of the remaining dots.
 	 */
 	public int update(float pacmanX, float pacmanY) {
@@ -104,7 +104,7 @@ public class Map {
 	}
 	
 	/**
-	 * render method here gets called in the render method in Game class, which gets 
+	 * render method here gets called in the render method in MainGameState class, which gets
 	 * executed after update method in every frame.
 	 * It renders the updated map based on the updated data (mainly updated location of dots).
 	 */

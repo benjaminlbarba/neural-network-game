@@ -148,7 +148,7 @@ public class Ghost {
 	
 	/**
 	 * Implemented from the abstract method in BasicCharacter class,
-	 * update method is called every frame of the game by the governing update method in Game class.
+	 * update method is called every frame of the game by the governing update method in MainGameState class.
 	 * it updates the positions (x, y) and directions (dir) of the Ghost without needing to process
 	 * any keyboard input. 
 	 */
