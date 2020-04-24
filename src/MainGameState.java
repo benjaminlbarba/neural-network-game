@@ -67,7 +67,6 @@ public class MainGameState extends BasicGameState {
 				this.map.getXFromColNumber(this.mapData.pacmanRowColTuple.col),
 				this.map.getYFromRowNumber(this.mapData.pacmanRowColTuple.row),
 				elementPixelUnit,
-				map,
 				isDebug);
 	}
 
