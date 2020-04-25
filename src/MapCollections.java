@@ -3,6 +3,11 @@ public class MapCollections {
 	private static char[][][] mapsArray = {
 			{
 				{'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'},
+				{'#',' ','.','.','.','.','.','.','*','#','#','#',' ',' ',' ',' ',' ','#','#'},
+				{'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'}
+			},
+			{
+				{'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'},
 				{'#','*','.','.','.','.','.','.','.','#',' ','#','.','.','.','.','.','#','#'},
 				{'#','#','#','#','#','#','#','.','#',' ','#','.','.','#','.','#','.','.','#'},
 				{'#','.','#','.','#','.','.','.','#',' ','#','.','#','.','#','.','#','.','#'},
@@ -68,6 +73,7 @@ public class MapCollections {
 		};
 
 	private static final RowColTuple[] pacmanRowColTupleArray = {
+			new RowColTuple(1, 1),
 			new RowColTuple(14, 10),
 			new RowColTuple(19, 15),
 			new RowColTuple(1, 1),
@@ -75,6 +81,7 @@ public class MapCollections {
 
 	// Each map hosts more than one ghost
 	private static final RowColTuple[][] ghostRowColTuplesArrary = {
+			{new RowColTuple(1, 15)},
 			{new RowColTuple(1, 1)},
 			{new RowColTuple(4, 9), new RowColTuple(4, 10)},
 			{new RowColTuple(1, 6), new RowColTuple(1, 8), new RowColTuple(1, 13), new RowColTuple(5, 10)},
