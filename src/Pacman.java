@@ -22,6 +22,9 @@ public class Pacman {
 
     private HashMap<Directions, Animation> pacmanAnimations = new HashMap<>();
 
+    private float initialX;
+    private float initialY;
+
     private float x;
     private float y;
 
@@ -48,9 +51,12 @@ public class Pacman {
     private ArrayList<Shape> wallShapesAroundPacman;
 
 
-    public Pacman(float x, float y, float elementPixelUnit, boolean isDebug) {
-        this.x = x;
-        this.y = y;
+    public Pacman(float initialX, float initialY, float elementPixelUnit, boolean isDebug) {
+        this.initialX = initialX;
+        this.initialY = initialY;
+        this.x = initialX;
+        this.y = initialY;
+
         this.dir = Directions.STILL;
         this.isDebug = isDebug;
         this.elementPixelUnit = elementPixelUnit;
@@ -316,6 +322,14 @@ public class Pacman {
         isAddScore = true;
     }
 
+    public float getInitialX() {
+        return initialX;
+    }
+
+    public float getInitialY() {
+        return initialY;
+    }
+
     /**
      * Getter for x.
      *
@@ -332,6 +346,14 @@ public class Pacman {
      */
     public float getY() {
         return y;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
     }
 
     public float getCenterX() {

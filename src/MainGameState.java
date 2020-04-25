@@ -22,15 +22,13 @@ public class MainGameState extends BasicGameState {
 	// YQ: The ratio for how much width and height for map to be displayed on given window
 	private float mapWindowRatio = (float) 0.7;
 
-	private Score score;
+	private GameInfo gameInfo;
 	private HashMap<Integer, Directions> keyMap;
 	
 	private MapData mapData = MapCollections.getMapData(1);
 	
 	private Map map;
 	private Pacman pacman;
-
-	private int lives = 3;
 
 	// For the initial implementation, we are just implementing one ghost. After the basic game is created, we will set up more ghosts.
 	private ArrayList<Ghost> ghosts = new ArrayList<>();
@@ -40,7 +38,7 @@ public class MainGameState extends BasicGameState {
 		this.gameWindowWidth = gameWindowWidth;
 		this.gameWindowHeight = gameWindowHeight;
 		
-		this.score = new Score();
+		this.gameInfo = new GameInfo();
 
 		this.elementPixelUnit = this.getElementPixelUnit(
 				mapData.mapArray[0].length, 
@@ -115,12 +113,14 @@ public class MainGameState extends BasicGameState {
 	 */
 	@Override
 	public void update(GameContainer container, StateBasedGame stateBasedGame, int delta) {
-		if (this.lives > 0) {
+		if (this.gameInfo.getLives() > 0) {
 			stateBasedGame.enterState(GameStateManager.mainGameStateId);
 		}
 		else {
 			stateBasedGame.enterState(GameStateManager.gameOverStateId);
 		}
+
+		this.manageGhostPacmanCollision();
 
 		// For some reason the overridden keyPressed method stopped being triggered. Therefore explicitly passing
 		// pressed keys here.
@@ -148,7 +148,7 @@ public class MainGameState extends BasicGameState {
 		
 		// update for map
 		int scoreAdded = this.map.update(this.pacman.getX(), this.pacman.getY());
-		this.score.addScore(scoreAdded);
+		this.gameInfo.addScore(scoreAdded);
 	}
 	
 	/**
@@ -159,14 +159,14 @@ public class MainGameState extends BasicGameState {
 	public void render(GameContainer container, StateBasedGame stateBasedGame, Graphics g) {
 		this.map.render(g);
 
+		this.pacman.render(g);
 		this.ghosts.forEach(ghost -> {
 			ghost.render(g);
 			if (ghost.getIsCollidingWithPacman()) {
 				g.drawString("Pacman hits ghost: true", 50, 50);
 			}
 		});
-		this.pacman.render(g);
-		this.score.render(g);
+		this.gameInfo.render(g);
 	}
 
 	@Override
@@ -188,13 +188,28 @@ public class MainGameState extends BasicGameState {
 		}
 	}
 
-	public int getLives() {
-		return lives;
-	}
+	private void manageGhostPacmanCollision() {
+		boolean isPacmanKilled = false;
+		for (Ghost ghost : this.ghosts) {
+			if (ghost.getIsCollidingWithPacman()) {
+				isPacmanKilled = true;
+				break;
+			}
+		}
 
-	public void setLives(int lives) {
-		this.lives = lives;
-	}
+		if (isPacmanKilled) {
+			this.gameInfo.setLives(this.gameInfo.getLives() - 1);
+			this.pacman.setX(this.pacman.getInitialX());
+			this.pacman.setY(this.pacman.getInitialY());
 
+			for (Ghost ghost: this.ghosts) {
+				ghost.timer.reset();
+				ghost.resetIsCollidingWithPacman();
+				ghost.setX(ghost.getInitialX());
+				ghost.setY(ghost.getInitialY());
+			}
+		}
+
+	}
 	
 }

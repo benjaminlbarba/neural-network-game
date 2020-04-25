@@ -21,7 +21,7 @@ import org.newdawn.slick.geom.Shape;
  */
 public class Ghost {
 	private boolean isDebug;
-	private Timer timer = new Timer();
+	public Timer timer = new Timer();
 
 	private GhostColors ghostColor;
 	// Each ghost on the map to have slightly different time to be activated to avoid movement overlapping
@@ -47,7 +47,10 @@ public class Ghost {
 	private float closestNonCollisionX;
 	private float closestNonCollisionY;
 
+	private float initialX;
+	private float initialY;
 	private float x;
+
 	private float y;
 	private Directions dir;
 	private final float speed = 1;
@@ -60,6 +63,8 @@ public class Ghost {
 		this.setGhostStartDelay(ghostIndex);
 		this.isDebug = isDebug;
 
+		this.initialX = initialX;
+		this.initialY = initialY;
 		this.x = initialX;
 		this.y = initialY;
 		this.elementPixelUnit = elementPixelUnit;
@@ -435,6 +440,14 @@ public class Ghost {
 		return this.y;
 	}
 
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public void setY(float y) {
+		this.y = y;
+	}
+
 	private void setIsCollidingWithPacman() {
 		this.isCollidingWithPacman = this.pacmanCircle.intersects(this.ghostCircle);
 	}
@@ -468,6 +481,19 @@ public class Ghost {
 	}
 
 	public boolean getIsCollidingWithPacman() {
+
 		return this.isCollidingWithPacman;
+	}
+
+	public void resetIsCollidingWithPacman() {
+		this.isCollidingWithPacman = false;
+	}
+
+	public float getInitialX() {
+		return initialX;
+	}
+
+	public float getInitialY() {
+		return initialY;
 	}
 }
