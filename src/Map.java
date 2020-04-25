@@ -20,6 +20,8 @@ import org.newdawn.slick.geom.Shape;
  */
 public class Map {
 	private boolean isDebug;
+
+
 	private boolean isFirstRender = true;
 
 	private int mapDataRowCount;
@@ -30,6 +32,11 @@ public class Map {
 	private float mapOriginY;
 	
 	private MapData mapData;
+
+	public ArrayList<Shape> getWallShapes() {
+		return wallShapes;
+	}
+
 	private ArrayList<Shape> wallShapes = new ArrayList<>();
 
 	private int currentDotCount;
@@ -241,5 +248,9 @@ public class Map {
 
 	public int getCurrentDotCount() {
 		return this.currentDotCount;
+	}
+
+	public boolean isFirstRender() {
+		return isFirstRender;
 	}
 }

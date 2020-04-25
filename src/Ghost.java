@@ -51,6 +51,11 @@ public class Ghost {
 	private float y;
 	private Directions dir;
 	private final float speed = 1.5f;
+
+	public boolean isAtIntersection() {
+		return isAtIntersection;
+	}
+
 	private boolean isAtIntersection = false;
 	private boolean isCollidingWithWall = false;
 	private boolean isCollidingWithPacman = false;
@@ -79,6 +84,10 @@ public class Ghost {
 	// Each ghost start one second after the last ghost
 	private void setGhostStartDelay(int ghostIndex) {
 		this.ghostStartDelay = (float) (ghostIndex * 2);
+	}
+
+	public Directions getDir() {
+		return dir;
 	}
 
 	public void init(float pacmanCenterX, float pacmanCenterY) {
