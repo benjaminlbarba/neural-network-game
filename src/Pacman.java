@@ -17,13 +17,12 @@ import java.util.HashMap;
 public class Pacman {
 
     public static final float stepSize = 1.5f; // must be factor of blockSize (length of row and col)
-    private boolean isAddScore;
     private Directions nextDir;
 
-    private HashMap<Directions, Animation> pacmanAnimations = new HashMap<>();
+    private final HashMap<Directions, Animation> pacmanAnimations = new HashMap<>();
 
-    private float initialX;
-    private float initialY;
+    private final float initialX;
+    private final float initialY;
 
     private float x;
     private float y;
@@ -31,26 +30,32 @@ public class Pacman {
     private float centerX;
     private float centerY;
 
-    private float elementPixelUnit;
+    private final float elementPixelUnit;
     private Directions dir;
     private Circle pacmanCircle;
-    private float pacmanCircleRadius;
-
+    private final float pacmanCircleRadius;
 
     private boolean isAtIntersection = false;
 
     private float closestNonCollisionX;
     private float closestNonCollisionY;
 
-    private boolean isDebug;
-    private Animation pacmanRightAnimation;
+    private final boolean isDebug;
 
     private HashMap<Directions, Integer> dirMapX;
     private HashMap<Directions, Integer> dirMapY;
+
     private boolean isColliding = false;
     private ArrayList<Shape> wallShapesAroundPacman;
 
-
+    /**
+     * Constructor for Pacman class taking in its parameters specified below.
+     *
+     * @param initialX         the initial x coordinate of pacman
+     * @param initialY         the initial y coordinate of pacman
+     * @param elementPixelUnit how many pixel (xy coordinate unit length) is one row/column equal to.
+     * @param isDebug          boolean whether debug mode is on
+     */
     public Pacman(float initialX, float initialY, float elementPixelUnit, boolean isDebug) {
         this.initialX = initialX;
         this.initialY = initialY;
@@ -65,6 +70,9 @@ public class Pacman {
         initDirMap();
     }
 
+    /**
+     * Initialize all direction animation of Pacman, associating animations with different directions.
+     */
     public void init() {
         try {
             SpriteSheet pacmanLeftSpriteSheet = new SpriteSheet("images/pacman/pacman_left.jpg", 56, 56);
@@ -104,23 +112,6 @@ public class Pacman {
 
     }
 
-    protected void initDirMap() {
-        dirMapX = new HashMap<Directions, Integer>();
-        dirMapY = new HashMap<Directions, Integer>();
-        Directions[] dindex = {
-                Directions.STILL,
-                Directions.LEFT,
-                Directions.RIGHT,
-                Directions.UP,
-                Directions.DOWN
-        };
-        int[] dx = {0, -1, 1, 0, 0};
-        int[] dy = {0, 0, 0, -1, 1};
-        for (int i = 0; i < dindex.length; i++) {
-            dirMapX.put(dindex[i], dx[i]);
-            dirMapY.put(dindex[i], dy[i]);
-        }
-    }
 
     /**
      * update method is called every frame of the game by the governing update method in MainGameState class.
@@ -153,6 +144,11 @@ public class Pacman {
     }
 
 
+    /**
+     * Method to rendering Pacman image.
+     *
+     * @param g Graphics
+     */
     public void render(Graphics g) {
         this.pacmanAnimations.get(this.dir).draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
         if (isDebug) {
@@ -160,56 +156,6 @@ public class Pacman {
         }
     }
 
-    /**
-     * Return whether next position is accessible given dir.
-     *
-     * @param d direction for next position
-     * @return boolean whether next position is accessible given dir.
-     * @see Directions
-     */
-    private boolean dirMovable(Directions d) {
-        float nextX = x + elementPixelUnit * dirMapX.get(d);
-        float nextY = y + elementPixelUnit * dirMapY.get(d);
-
-        this.pacmanCircle.setCenterX(nextX + this.elementPixelUnit / 2);
-        this.pacmanCircle.setCenterY(nextY + this.elementPixelUnit / 2);
-        boolean isNextPositionPacmanCircleColliding = this.getIsCollidingWithCircle(this.pacmanCircle);
-        updatePacmanCirclePosition();
-        return !isNextPositionPacmanCircleColliding;
-    }
-
-    /*    *//**
-     * Return boolean whether current coordinate is at cell center.
-     *
-     * @param x x coordinate
-     * @param y y coordinate
-     * @return boolean is at cell center
-     *//*
-    public boolean isAtCellCenter(float x, float y) {
-        boolean b = (Math.round(x) == Math.round(map.getClosestNonCollisionX(x))) &&
-                (Math.round(y) == Math.round(map.getClosestNonCollisionY(y)));
-        return b;
-    }*/
-
-    /**
-     * This method updates the center x,y of the circle based on the x, y of the pacman animation.
-     */
-    private void updatePacmanCirclePosition() {
-        this.centerX = this.x + this.elementPixelUnit / 2;
-        this.centerY = this.y + this.elementPixelUnit / 2;
-
-        this.pacmanCircle.setCenterX(centerX);
-        this.pacmanCircle.setCenterY(centerY);
-    }
-
-    /**
-     * Setter for nextDir
-     *
-     * @param nextDir nextDir to be set
-     */
-    public void setNextDir(Directions nextDir) {
-        this.nextDir = nextDir;
-    }
 
     public void setWallShapesAroundPacman(ArrayList<Shape> wallShapesAroundPacman) {
         this.wallShapesAroundPacman = wallShapesAroundPacman;
@@ -223,6 +169,12 @@ public class Pacman {
         this.y = this.closestNonCollisionY;
     }
 
+    /**
+     * Determine if wall shapes around Pacman is colliding with Pacman circle.
+     *
+     * @param circle Pacman circle
+     * @return boolean whether collision happens
+     */
     public boolean getIsCollidingWithCircle(Circle circle) {
         for (Shape wall : this.wallShapesAroundPacman) {
             if (circle.intersects(wall)) {
@@ -232,6 +184,9 @@ public class Pacman {
         return false;
     }
 
+    /**
+     * Set isAtIntersection and isColliding according to whether Pacman circle intersects with wall shapes and available directions at current coordinate.
+     */
     public void setIsAtIntersectionAndCollidingWithWall() {
         for (Shape wall : this.wallShapesAroundPacman) {
             if (this.pacmanCircle.intersects(wall)) {
@@ -243,8 +198,8 @@ public class Pacman {
         // if the ghost is close enough to a nearest non collision location (path center) and the pacman temp circle
         // (placed at the nearest path center) has more than 2 available directions
         // (more than current direction and its reverse), it is also at intersection.
-        if (Math.abs(this.closestNonCollisionX - this.x) < this.stepSize / 2 &&
-                Math.abs(this.closestNonCollisionY - this.y) < this.stepSize / 2 &&
+        if (Math.abs(this.closestNonCollisionX - this.x) < stepSize / 2 &&
+                Math.abs(this.closestNonCollisionY - this.y) < stepSize / 2 &&
                 this.getAvailableDirections(this.closestNonCollisionX, this.closestNonCollisionY).size() >= 2) {
             this.isAtIntersection = true;
             return;
@@ -254,7 +209,18 @@ public class Pacman {
         this.isColliding = false;
     }
 
+    /**
+     * Setter for nextDir
+     *
+     * @param nextDir nextDir to be set
+     */
+    public void setNextDir(Directions nextDir) {
+        this.nextDir = nextDir;
+    }
 
+    /**
+     * Update Pacman position using direction maps.
+     */
     public void updatePosition() {
         if (dir != Directions.STILL) {
             x += dirMapX.get(dir) * stepSize;
@@ -262,73 +228,16 @@ public class Pacman {
         }
     }
 
-
-    // This method creates a temporary pacman circle that is placed one radius distance more than the
-    // current actual pacman circle for each of the four directions. Then it populates available directions for those
-    // that do not cause a collision between the temporary pacman circle and the wallShapesAroundPacman.
-    private ArrayList<Directions> getAvailableDirections(float x, float y) {
-        ArrayList<Directions> availableDirections = new ArrayList<>();
-
-        float currentCircleCenterX = x + this.elementPixelUnit / 2;
-        float currentCircleCenterY = y + this.elementPixelUnit / 2;
-
-        Circle tempPacmanCircle = new Circle(
-                currentCircleCenterX,
-                currentCircleCenterY,
-                this.pacmanCircleRadius);
-
-        // LEFT
-        tempPacmanCircle.setCenterX(currentCircleCenterX - this.pacmanCircleRadius);
-        tempPacmanCircle.setCenterY(currentCircleCenterY);
-        if (!this.wallShapesAroundPacman.stream().anyMatch(w -> tempPacmanCircle.intersects(w))) {
-            availableDirections.add(Directions.LEFT);
-        }
-
-        // RIGHT
-        tempPacmanCircle.setCenterX(currentCircleCenterX + this.pacmanCircleRadius);
-        tempPacmanCircle.setCenterY(currentCircleCenterY);
-        if (!this.wallShapesAroundPacman.stream().anyMatch(w -> tempPacmanCircle.intersects(w))) {
-            availableDirections.add(Directions.RIGHT);
-        }
-        // UP
-        tempPacmanCircle.setCenterX(currentCircleCenterX);
-        tempPacmanCircle.setCenterY(currentCircleCenterY - this.pacmanCircleRadius);
-        if (!this.wallShapesAroundPacman.stream().anyMatch(w -> tempPacmanCircle.intersects(w))) {
-            availableDirections.add(Directions.UP);
-        }
-        // DOWN
-        tempPacmanCircle.setCenterX(currentCircleCenterX);
-        tempPacmanCircle.setCenterY(currentCircleCenterY + this.pacmanCircleRadius);
-        if (!this.wallShapesAroundPacman.stream().anyMatch(w -> tempPacmanCircle.intersects(w))) {
-            availableDirections.add(Directions.DOWN);
-        }
-
-        return availableDirections;
-    }
-
     /**
-     * Getter for isAddScore
-     *
-     * @return boolean whether score should be incremented if dot is eaten.
+     * Method to reset Pacman to its initial coordinates and directions to STILL.
      */
-    public boolean isAddScore() {
-        return isAddScore;
+    public void reset() {
+        this.x = this.initialX;
+        this.y = this.initialY;
+        this.dir = Directions.STILL;
+        this.nextDir = Directions.STILL;
     }
 
-    /**
-     * Set isAddScore to true;
-     */
-    private void addScore() {
-        isAddScore = true;
-    }
-
-    public float getInitialX() {
-        return initialX;
-    }
-
-    public float getInitialY() {
-        return initialY;
-    }
 
     /**
      * Getter for x.
@@ -348,18 +257,38 @@ public class Pacman {
         return y;
     }
 
+    /**
+     * Setter for x.
+     *
+     * @param x x coordinate of Pacman.
+     */
     public void setX(float x) {
         this.x = x;
     }
 
+    /**
+     * Setter for y.
+     *
+     * @param y y coordinate of Pacman.
+     */
     public void setY(float y) {
         this.y = y;
     }
 
+    /**
+     * Getter for center x.
+     *
+     * @return center x
+     */
     public float getCenterX() {
         return centerX;
     }
 
+    /**
+     * Getter for center y.
+     *
+     * @return center y
+     */
     public float getCenterY() {
         return centerY;
     }
@@ -400,26 +329,128 @@ public class Pacman {
         nextDir = dir;
     }
 
+    /**
+     * Getter for Pacman circle.
+     *
+     * @return Pacman circle
+     */
     public Circle getPacmanCircle() {
         return this.pacmanCircle;
     }
 
+    /**
+     * Getter for direction map for x coordinate.
+     *
+     * @return Direction map for x coordinate
+     */
     public HashMap<Directions, Integer> getDirMapX() {
         return dirMapX;
     }
 
-    public HashMap<Directions, Animation> getPacmanAnimations() {
-        return pacmanAnimations;
-    }
 
+    /**
+     * Getter for boolean isAtIntersection.
+     *
+     * @return boolean isAtIntersection
+     */
     public boolean getIsAtIntersection() {
         return isAtIntersection;
     }
 
-    public void reset() {
-        this.x = this.initialX;
-        this.y = this.initialY;
-        this.dir = Directions.STILL;
-        this.nextDir = Directions.STILL;
+
+    /**
+     * Initialize direction map, which maps different directions with their corresponding moves in x and y coordinate.
+     */
+    protected void initDirMap() {
+        dirMapX = new HashMap<Directions, Integer>();
+        dirMapY = new HashMap<Directions, Integer>();
+        Directions[] dindex = {
+                Directions.STILL,
+                Directions.LEFT,
+                Directions.RIGHT,
+                Directions.UP,
+                Directions.DOWN
+        };
+        int[] dx = {0, -1, 1, 0, 0};
+        int[] dy = {0, 0, 0, -1, 1};
+        for (int i = 0; i < dindex.length; i++) {
+            dirMapX.put(dindex[i], dx[i]);
+            dirMapY.put(dindex[i], dy[i]);
+        }
     }
+
+    /**
+     * Return whether next position is accessible given dir.
+     *
+     * @param d direction for next position
+     * @return boolean whether next position is accessible given dir.
+     * @see Directions
+     */
+    private boolean dirMovable(Directions d) {
+        float nextX = x + elementPixelUnit * dirMapX.get(d);
+        float nextY = y + elementPixelUnit * dirMapY.get(d);
+
+        this.pacmanCircle.setCenterX(nextX + this.elementPixelUnit / 2);
+        this.pacmanCircle.setCenterY(nextY + this.elementPixelUnit / 2);
+        boolean isNextPositionPacmanCircleColliding = this.getIsCollidingWithCircle(this.pacmanCircle);
+        updatePacmanCirclePosition();
+        return !isNextPositionPacmanCircleColliding;
+    }
+
+
+    /**
+     * This method updates the center x,y of the circle based on the x, y of the pacman animation.
+     */
+    private void updatePacmanCirclePosition() {
+        this.centerX = this.x + this.elementPixelUnit / 2;
+        this.centerY = this.y + this.elementPixelUnit / 2;
+
+        this.pacmanCircle.setCenterX(centerX);
+        this.pacmanCircle.setCenterY(centerY);
+    }
+
+
+    // This method creates a temporary pacman circle that is placed one radius distance more than the
+    // current actual pacman circle for each of the four directions. Then it populates available directions for those
+    // that do not cause a collision between the temporary pacman circle and the wallShapesAroundPacman.
+    private ArrayList<Directions> getAvailableDirections(float x, float y) {
+        ArrayList<Directions> availableDirections = new ArrayList<>();
+
+        float currentCircleCenterX = x + this.elementPixelUnit / 2;
+        float currentCircleCenterY = y + this.elementPixelUnit / 2;
+
+        Circle tempPacmanCircle = new Circle(
+                currentCircleCenterX,
+                currentCircleCenterY,
+                this.pacmanCircleRadius);
+
+        // LEFT
+        tempPacmanCircle.setCenterX(currentCircleCenterX - this.pacmanCircleRadius);
+        tempPacmanCircle.setCenterY(currentCircleCenterY);
+        if (this.wallShapesAroundPacman.stream().noneMatch(tempPacmanCircle::intersects)) {
+            availableDirections.add(Directions.LEFT);
+        }
+
+        // RIGHT
+        tempPacmanCircle.setCenterX(currentCircleCenterX + this.pacmanCircleRadius);
+        tempPacmanCircle.setCenterY(currentCircleCenterY);
+        if (this.wallShapesAroundPacman.stream().noneMatch(tempPacmanCircle::intersects)) {
+            availableDirections.add(Directions.RIGHT);
+        }
+        // UP
+        tempPacmanCircle.setCenterX(currentCircleCenterX);
+        tempPacmanCircle.setCenterY(currentCircleCenterY - this.pacmanCircleRadius);
+        if (this.wallShapesAroundPacman.stream().noneMatch(tempPacmanCircle::intersects)) {
+            availableDirections.add(Directions.UP);
+        }
+        // DOWN
+        tempPacmanCircle.setCenterX(currentCircleCenterX);
+        tempPacmanCircle.setCenterY(currentCircleCenterY + this.pacmanCircleRadius);
+        if (this.wallShapesAroundPacman.stream().noneMatch(tempPacmanCircle::intersects)) {
+            availableDirections.add(Directions.DOWN);
+        }
+
+        return availableDirections;
+    }
+
 }

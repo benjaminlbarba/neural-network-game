@@ -2,9 +2,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.newdawn.slick.geom.Circle;
-import org.newdawn.slick.geom.Shape;
-
 
 class PacmanTest {
     Pacman pacmanTest = new Pacman(212, 90, 22, false);
