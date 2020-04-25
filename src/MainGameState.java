@@ -11,6 +11,8 @@ import org.newdawn.slick.state.StateBasedGame;
  * the Java game library Slick2D. In addition, MainGameState class handles connections between key pressed and game controls during game play.
  */
 public class MainGameState extends BasicGameState {
+	private boolean isDebug;
+
 	private int gameWindowHeight;
 	private int gameWindowWidth;
 	
@@ -25,30 +27,35 @@ public class MainGameState extends BasicGameState {
 	private GameInfo gameInfo;
 	private HashMap<Integer, Directions> keyMap;
 	
-	private MapData mapData = MapCollections.getMapData(1);
+	private MapData mapData;
 	
 	private Map map;
 	private Pacman pacman;
 
-	// For the initial implementation, we are just implementing one ghost. After the basic game is created, we will set up more ghosts.
-	private ArrayList<Ghost> ghosts = new ArrayList<>();
+	private ArrayList<Ghost> ghosts;
 
 	public MainGameState(int gameWindowWidth, int gameWindowHeight, boolean isDebug) {
+		this.isDebug = isDebug;
 		initKeyMap();
 		this.gameWindowWidth = gameWindowWidth;
 		this.gameWindowHeight = gameWindowHeight;
 		
 		this.gameInfo = new GameInfo();
+		this.setupMapGhostsPacmanObjects(false);
+	}
 
+	private void setupMapGhostsPacmanObjects(boolean isLevelUp) {
+		this.pickMapDataFromCollection();
 		this.elementPixelUnit = this.getElementPixelUnit(
-				mapData.mapArray[0].length, 
-				mapData.mapArray.length, 
-				gameWindowWidth, 
+				mapData.mapArray[0].length,
+				mapData.mapArray.length,
+				gameWindowWidth,
 				gameWindowHeight);
-		
+
 		this.map = new Map(mapData, elementPixelUnit, this.getMapOriginX(), this.getMapOriginY(), isDebug);
 
 		RowColTuple[] ghostsOnMap = this.mapData.ghostRowColTuples;
+		this.ghosts = new ArrayList<>();
 		for (int i = 0; i < ghostsOnMap.length; i++) {
 			this.ghosts.add(
 					new Ghost(
@@ -57,7 +64,7 @@ public class MainGameState extends BasicGameState {
 							this.elementPixelUnit,
 							isDebug,
 							i
-							)
+					)
 			);
 		}
 
@@ -66,6 +73,12 @@ public class MainGameState extends BasicGameState {
 				this.map.getYFromRowNumber(this.mapData.pacmanRowColTuple.row),
 				elementPixelUnit,
 				isDebug);
+
+		if (isLevelUp) {
+			this.map.init();
+			this.pacman.init();
+			this.ghosts.forEach(ghost -> ghost.init(this.pacman.getCenterX(), this.pacman.getCenterY()));
+		}
 	}
 
 	private void initKeyMap() {
@@ -74,6 +87,19 @@ public class MainGameState extends BasicGameState {
 		keyMap.put(Input.KEY_RIGHT, Directions.RIGHT);
 		keyMap.put(Input.KEY_UP, Directions.UP);
 		keyMap.put(Input.KEY_DOWN, Directions.DOWN);
+	}
+
+	private void pickMapDataFromCollection() {
+		int currentLevel = this.gameInfo.getLevel();
+
+		int availableMapCount = MapCollections.getAvailableMapCount();
+
+		if (currentLevel <= availableMapCount) {
+			this.mapData = MapCollections.getMapData(currentLevel - 1);
+		}
+		else {
+			this.mapData = MapCollections.getMapData(availableMapCount - 1);
+		}
 	}
 
 	// Fit the map fully to the window by returning the smaller convertionRatio between width and height
@@ -149,8 +175,12 @@ public class MainGameState extends BasicGameState {
 		// update for map
 		int scoreAdded = this.map.update(this.pacman.getX(), this.pacman.getY());
 		this.gameInfo.addScore(scoreAdded);
+
+		if (this.map.getCurrentDotCount() <= 0) {
+			this.levelUp();
+		}
 	}
-	
+
 	/**
 	 * render method is overridden from BasicGame class, it gets executed after update method in every frame.
 	 * It renders the updated map, ghosts, and pacman, based on the updated data.
@@ -205,7 +235,10 @@ public class MainGameState extends BasicGameState {
 				ghost.rest();
 			}
 		}
-
 	}
-	
+
+	private void levelUp() {
+		this.gameInfo.setLevel(this.gameInfo.getLevel() + 1);
+		this.setupMapGhostsPacmanObjects(true);
+	}
 }

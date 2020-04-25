@@ -2,9 +2,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
-
-import com.sun.tools.javac.util.List;
-import org.lwjgl.Sys;
 import org.lwjgl.util.Timer;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
@@ -53,7 +50,7 @@ public class Ghost {
 
 	private float y;
 	private Directions dir;
-	private final float speed = 1;
+	private final float speed = 1.5f;
 	private boolean isAtIntersection = false;
 	private boolean isCollidingWithWall = false;
 	private boolean isCollidingWithPacman = false;

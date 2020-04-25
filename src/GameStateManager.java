@@ -26,7 +26,6 @@ public class GameStateManager extends StateBasedGame {
 
 	@Override
 	public void keyPressed(int key, char c) {
-		System.out.println("key pressed in GameStateManager");
 		this.getState(mainGameStateId).keyPressed(key, c);
 	}
 
@@ -35,6 +34,7 @@ public class GameStateManager extends StateBasedGame {
 		AppGameContainer appGameContainer = new AppGameContainer(new GameStateManager("Pacman"));
 
 		appGameContainer.setDisplayMode(gameWindowWidth, gameWindowHeight, false);
+		appGameContainer.setShowFPS(false);
 		appGameContainer.setAlwaysRender(true);
 		appGameContainer.setMinimumLogicUpdateInterval(1000 / 60);
 		appGameContainer.start();

@@ -31,8 +31,7 @@ public class Map {
 	
 	private MapData mapData;
 	private ArrayList<Shape> wallShapes = new ArrayList<>();
-	
-	private int initialDotCount;
+
 	private int currentDotCount;
 	
 	private Image wallElementImage;
@@ -46,13 +45,10 @@ public class Map {
 		
 		this.elementPixelUnit = elementPixelUnit;
 		this.mapOriginX = mapOriginX;
-		System.out.println("mapOriginX="+mapOriginX);
 		this.mapOriginY = mapOriginY;
-		System.out.println("mapOriginY="+mapOriginY);
-		
+
 		this.mapDataRowCount = mapData.mapArray.length;
 		this.mapDataColCount = mapData.mapArray[0].length;
-		this.initialDotCount = countMapDots();
 	}
 	
 	/**
@@ -68,6 +64,7 @@ public class Map {
 			System.out.println("WallElement image cannot be found.");
 		}
 		this.createWallShapes();
+		this.currentDotCount = this.countMapDots();
 	}
 
 	/**
@@ -100,6 +97,9 @@ public class Map {
 			mapData.mapArray[rowNum][colNum] = ' ';
 			return 100;
 		}
+
+		this.currentDotCount = this.countMapDots();
+
 		return 0;
 	}
 	
@@ -120,7 +120,16 @@ public class Map {
 	 * Counts the number of dots on the map to be used for calculating score.
 	 */
 	private int countMapDots() {
-		return 0;
+		int dotCount = 0;
+		for (int r = 0; r < this.mapDataRowCount; r++) {
+			for (int c = 0; c < this.mapDataColCount; c++) {
+				if (this.mapData.mapArray[r][c] == '.') {
+					dotCount++;
+				}
+			}
+		}
+
+		return dotCount;
 	}
 	
 	public float getXFromColNumber(int columnNumber) {
@@ -230,4 +239,7 @@ public class Map {
 		return this.mapData;
 	}
 
+	public int getCurrentDotCount() {
+		return this.currentDotCount;
+	}
 }
