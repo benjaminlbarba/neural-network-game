@@ -7,6 +7,7 @@ import org.newdawn.slick.state.StateBasedGame;
 
 public class GameOverState extends BasicGameState {
     Image backgroundImage;
+    Image replayButtonImage;
 
 
     @Override
@@ -17,6 +18,7 @@ public class GameOverState extends BasicGameState {
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
         this.backgroundImage = new Image("images/gameOverWallpaper.jpg");
+        this.replayButtonImage = new Image("images/replayButton.png");
     }
 
     @Override
@@ -29,7 +31,14 @@ public class GameOverState extends BasicGameState {
         float imageX = (gameContainer.getWidth() - imageScale * this.backgroundImage.getWidth()) / 2;
         float imageY = (gameContainer.getHeight() - imageScale * this.backgroundImage.getHeight()) / 2;
 
-        this.backgroundImage.draw(imageX,imageY, imageScale);
+        this.backgroundImage.draw(imageX, imageY, imageScale);
+
+        float buttonWidth = (float) (gameContainer.getWidth() * 0.2);
+        float buttonScale = buttonWidth / this.replayButtonImage.getWidth();
+        float buttonHeight = buttonScale * this.replayButtonImage.getHeight();
+        float buttonX = gameContainer.getWidth() / 2 - buttonWidth / 2;
+        float buttonY = (float) (gameContainer.getHeight() * 0.7);
+        this.replayButtonImage.draw(buttonX, buttonY, buttonWidth, buttonHeight);
     }
 
     @Override

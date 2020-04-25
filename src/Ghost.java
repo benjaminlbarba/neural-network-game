@@ -496,4 +496,11 @@ public class Ghost {
 	public float getInitialY() {
 		return initialY;
 	}
+
+	public void rest() {
+		this.timer.reset();
+		this.resetIsCollidingWithPacman();
+		this.x = this.initialX;
+		this.y = this.initialY;
+	}
 }

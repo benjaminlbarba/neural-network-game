@@ -199,14 +199,10 @@ public class MainGameState extends BasicGameState {
 
 		if (isPacmanKilled) {
 			this.gameInfo.setLives(this.gameInfo.getLives() - 1);
-			this.pacman.setX(this.pacman.getInitialX());
-			this.pacman.setY(this.pacman.getInitialY());
+			this.pacman.reset();
 
 			for (Ghost ghost: this.ghosts) {
-				ghost.timer.reset();
-				ghost.resetIsCollidingWithPacman();
-				ghost.setX(ghost.getInitialX());
-				ghost.setY(ghost.getInitialY());
+				ghost.rest();
 			}
 		}
 

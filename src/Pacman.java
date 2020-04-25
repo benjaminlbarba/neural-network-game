@@ -415,4 +415,11 @@ public class Pacman {
     public boolean getIsAtIntersection() {
         return isAtIntersection;
     }
+
+    public void reset() {
+        this.x = this.initialX;
+        this.y = this.initialY;
+        this.dir = Directions.STILL;
+        this.nextDir = Directions.STILL;
+    }
 }
