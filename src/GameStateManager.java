@@ -13,6 +13,7 @@ public class GameStateManager extends StateBasedGame {
 
 	public static final int mainGameStateId = 0;
 	public static final int gameOverStateId = 1;
+	public static final int historyHighScoreStateId = 2;
 
 	public GameStateManager(String title) {
 		super(title);
@@ -22,6 +23,7 @@ public class GameStateManager extends StateBasedGame {
 	public void initStatesList(GameContainer gameContainer) throws SlickException {
 		this.addState(new MainGameState(gameWindowWidth, gameWindowHeight, false));
 		this.addState(new GameOverState());
+		this.addState(new HistoryHighScoreState());
 	}
 
 	@Override

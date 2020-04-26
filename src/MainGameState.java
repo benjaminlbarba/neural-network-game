@@ -140,10 +140,13 @@ public class MainGameState extends BasicGameState {
 	@Override
 	public void update(GameContainer container, StateBasedGame stateBasedGame, int delta) {
 		if (this.gameInfo.getLives() > 0) {
-			stateBasedGame.enterState(GameStateManager.mainGameStateId);
+			 stateBasedGame.enterState(GameStateManager.mainGameStateId);
 		}
 		else {
-			stateBasedGame.enterState(GameStateManager.gameOverStateId);
+			this.gameInfo.updateHighScore();
+			HistoryHighScoreState.setCurrentScore(this.gameInfo.getScore());
+			stateBasedGame.enterState(GameStateManager.historyHighScoreStateId);
+//			stateBasedGame.enterState(GameStateManager.gameOverStateId);
 		}
 
 		this.manageGhostPacmanCollision();

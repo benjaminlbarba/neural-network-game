@@ -1,3 +1,10 @@
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.newdawn.slick.Graphics;
 
 /**
@@ -48,6 +55,43 @@ public class GameInfo {
 
 	public int getLevel() {
 		return this.level;
+	}
+	
+	/**
+	 * Update the high history scores
+	 * @return
+	 */
+	public boolean updateHighScore() {
+		// List<String> lines = Arrays.asList("0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+		Path file = Paths.get("high-scores.txt");
+		List<String> lines = Collections.emptyList();
+		try {
+			// Files.write(file, lines, StandardCharsets.UTF_8);
+			lines = Files.readAllLines(file, StandardCharsets.UTF_8); 
+		} catch (Exception e) {
+			// do nothing...
+			return false;
+		}
+		if (lines.size() != 10) {
+			return false;
+		}
+		List<Integer> intList = lines.stream()
+				.map(s -> Integer.parseInt(s))
+				.collect(Collectors.toList());
+		if (this.getScore() > intList.get(9)) {
+			intList.set(9, this.getScore());
+		}
+		Collections.sort(intList, Collections.reverseOrder()); 
+		List<String> newLines = intList.stream()
+				.map(s -> Integer.toString(s))
+				.collect(Collectors.toList());
+		try {
+			Files.write(file, newLines, StandardCharsets.UTF_8);
+		} catch (Exception e) {
+			// do nothing...
+			return false;
+		}
+		return true;
 	}
 
 }
