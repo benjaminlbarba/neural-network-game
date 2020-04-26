@@ -16,11 +16,17 @@ public class GameOverState extends BasicGameState {
     float imageX;
     float imageY;
     float imageHeight;
-    
-    float historyButtonX;
-    float historyButtonY;
+
+    float replayButtonWidth;
+    float replayButtonHeight;
+    float replayButtonX;
+    float replayButtonY;
+
     float historyButtonWidth;
     float historyButtonHeight;
+    float historyButtonX;
+    float historyButtonY;
+
 
 
     @Override
@@ -48,32 +54,38 @@ public class GameOverState extends BasicGameState {
 
         this.backgroundImage.draw(imageX, imageY, imageScale);
 
-        float buttonWidth = (float) (gameContainer.getWidth() * 0.2);
-        float buttonScale = buttonWidth / this.replayButtonImage.getWidth();
-        float buttonHeight = buttonScale * this.replayButtonImage.getHeight();
-        float buttonX = gameContainer.getWidth() / 2 - buttonWidth / 2;
-        float buttonY = (float) (gameContainer.getHeight() * 0.67);
-        this.replayButtonImage.draw(buttonX, buttonY, buttonWidth, buttonHeight);
+        this.replayButtonWidth = (float) (gameContainer.getWidth() * 0.2);
+        float buttonScale = replayButtonWidth / this.replayButtonImage.getWidth();
+        this.replayButtonHeight = buttonScale * this.replayButtonImage.getHeight();
+        this.replayButtonX = gameContainer.getWidth() / 2 - this.replayButtonWidth / 2;
+        this.replayButtonY = (float) (gameContainer.getHeight() * 0.67);
+        this.replayButtonImage.draw(this.replayButtonX, this.replayButtonY, this.replayButtonWidth, this.replayButtonHeight);
         
         this.historyButtonWidth = (float) (gameContainer.getWidth() * 0.2);
         float historyButtonScale = historyButtonWidth / this.replayButtonImage.getWidth();
         this.historyButtonHeight = historyButtonScale * this.replayButtonImage.getHeight();
-        this.historyButtonX = gameContainer.getWidth() / 2 - historyButtonWidth / 2;
-        this.historyButtonY = buttonY + 60;
+        this.historyButtonX = gameContainer.getWidth() / 2 - this.historyButtonWidth / 2;
+        this.historyButtonY = this.replayButtonY + 60;
         
-        this.historyButtonImage.draw(historyButtonX, historyButtonY, historyButtonWidth, historyButtonHeight);
+        this.historyButtonImage.draw(this.historyButtonX, this.historyButtonY, this.historyButtonWidth, this.historyButtonHeight);
     }
 
     @Override
     public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int i) throws SlickException {
     	float posX = Mouse.getX();
-    	float posY = imageHeight + 2 * imageY - Mouse.getY() - 16;
-    	if ((posX > historyButtonX && posX < historyButtonX + historyButtonWidth)
-    			&& (posY > historyButtonY && posY < historyButtonY + historyButtonHeight)) {
-    		if (Mouse.isButtonDown(0)) {
-    			stateBasedGame.enterState(GameStateManager.historyHighScoreStateId);
-    		}
+    	float posY = this.imageHeight + 2 * this.imageY - Mouse.getY() - 16;
+    	// Click history button
+    	if ((posX > this.historyButtonX && posX < this.historyButtonX + this.historyButtonWidth)
+    			&& (posY > this.historyButtonY && posY < this.historyButtonY + this.historyButtonHeight)
+                && Mouse.isButtonDown(0)) {
+            stateBasedGame.enterState(GameStateManager.historyHighScoreStateId);
     	}
+    	// Click replay button
+        if ((posX > this.replayButtonX && posX < this.replayButtonX + this.replayButtonWidth)
+                && (posY > this.replayButtonY && posY < this.replayButtonY + this.replayButtonHeight)
+                && Mouse.isButtonDown(0)) {
+            stateBasedGame.enterState(GameStateManager.mainGameStateId);
+        }
     }
 
     private float getFullWindowImageScale(float windowW, float windowH, Image image) {

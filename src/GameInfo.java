@@ -11,16 +11,16 @@ import org.newdawn.slick.Graphics;
  * GameInfo is the class that initializes the score in the game, keeps track of it, and display it on the game window.
  */
 public class GameInfo {
+	private static final int initialScore = 0;
+	private static final int initialLives = 3;
+	private static final int initialLevel = 1;
+
 	private int score;
 	private int lives;
 	private int level;
 
 	public GameInfo() {
-		// If we eventually decide to implement more complex initial score logic (such as different levels receives different initial scores),
-		// we should create a initializeScore method to handle that specifically.
-		this.score = 0;
-		this.lives = 3;
-		this.level = 1;
+		this.reset();
 	}
 
 	public void addScore(int scoreAdded) {
@@ -28,9 +28,11 @@ public class GameInfo {
 	}
 	
 	public void render(Graphics g) {
+		g.drawString("Press 'P' to see real power", 10, 0);
+
 		g.drawString("Level:" + this.level, 10, 50);
-		g.drawString("Score: " + this.score, 10, 100);
-		g.drawString("Remaining lives: " + this.lives, 10, 150);
+		g.drawString("Score: " + this.score, 10, 70);
+		g.drawString("Remaining lives: " + this.lives, 10, 90);
 	}
 
 	public int getLives() {
@@ -56,7 +58,13 @@ public class GameInfo {
 	public int getLevel() {
 		return this.level;
 	}
-	
+
+	public void reset() {
+		this.score = initialScore;
+		this.lives = initialLives;
+		this.level = initialLevel;
+	}
+
 	/**
 	 * Update the high history scores
 	 * @return

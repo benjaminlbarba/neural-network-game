@@ -15,11 +15,15 @@ import java.util.HashMap;
  * method update();
  */
 public class Pacman {
+    private final float normalSpeed = 1.5f;
+    private final float arvindSpeed = 2.0f;
+    private float speed;
 
-    public static final float stepSize = 1.5f; // must be factor of blockSize (length of row and col)
     private Directions nextDir;
 
-    private final HashMap<Directions, Animation> pacmanAnimations = new HashMap<>();
+    private HashMap<Directions, Animation> pacmanAnimations = new HashMap<>();
+    private Animation arvindAnimation;
+    private boolean shouldShowArvind = false;
 
     private final float initialX;
     private final float initialY;
@@ -71,31 +75,14 @@ public class Pacman {
     }
 
     /**
-     * Initialize all direction animation of Pacman, associating animations with different directions.
+     * Initializes all direction animation of Pacman, associating animations with different directions.
      */
     public void init() {
+        this.setCurrentSpeed();
+
         try {
-            SpriteSheet pacmanLeftSpriteSheet = new SpriteSheet("images/pacman/pacman_left.jpg", 56, 56);
-            Animation leftAnimation = new Animation(pacmanLeftSpriteSheet, 100);
-
-            SpriteSheet pacmanRightSpriteSheet = new SpriteSheet("images/pacman/pacman_right.jpg", 56, 56);
-            Animation rightAnimation = new Animation(pacmanRightSpriteSheet, 100);
-
-            SpriteSheet pacmanUpSpriteSheet = new SpriteSheet("images/pacman/pacman_up.jpg", 56, 56);
-            Animation upAnimation = new Animation(pacmanUpSpriteSheet, 100);
-
-            SpriteSheet pacmanDownSpriteSheet = new SpriteSheet("images/pacman/pacman_down.jpg", 56, 56);
-            Animation downAnimation = new Animation(pacmanDownSpriteSheet, 100);
-
-            SpriteSheet pacmanStillSpriteSheet = new SpriteSheet("images/pacman/pacman_still.jpg", 56, 56);
-            Animation stillAnimation = new Animation(pacmanStillSpriteSheet, 100);
-
-            this.pacmanAnimations.put(Directions.UP, upAnimation);
-            this.pacmanAnimations.put(Directions.DOWN, downAnimation);
-            this.pacmanAnimations.put(Directions.LEFT, leftAnimation);
-            this.pacmanAnimations.put(Directions.RIGHT, rightAnimation);
-            this.pacmanAnimations.put(Directions.STILL, stillAnimation);
-
+            this.initializePacmanAnimations();
+            this.initializeArvindAnimation();
 
             // This is the conversion between animation coordinate and circle coordinate so that they fully overlap.
             this.centerX = this.x + this.elementPixelUnit / 2;
@@ -110,6 +97,40 @@ public class Pacman {
             System.out.println("Cannot load Pacman images.");
         }
 
+    }
+
+    private void setCurrentSpeed() {
+        this.speed = this.shouldShowArvind ? this.arvindSpeed : this.normalSpeed;
+    }
+
+    private void initializeArvindAnimation() throws SlickException {
+        SpriteSheet arvindSpriteSheet = new SpriteSheet("images/pacman/arvind.jpg", 200, 200);
+        Animation arvindAnimation = new Animation(arvindSpriteSheet, 100);
+
+        this.arvindAnimation = arvindAnimation;
+    }
+
+    private void initializePacmanAnimations() throws SlickException {
+        SpriteSheet pacmanLeftSpriteSheet = new SpriteSheet("images/pacman/pacman_left.jpg", 56, 56);
+        Animation leftAnimation = new Animation(pacmanLeftSpriteSheet, 100);
+
+        SpriteSheet pacmanRightSpriteSheet = new SpriteSheet("images/pacman/pacman_right.jpg", 56, 56);
+        Animation rightAnimation = new Animation(pacmanRightSpriteSheet, 100);
+
+        SpriteSheet pacmanUpSpriteSheet = new SpriteSheet("images/pacman/pacman_up.jpg", 56, 56);
+        Animation upAnimation = new Animation(pacmanUpSpriteSheet, 100);
+
+        SpriteSheet pacmanDownSpriteSheet = new SpriteSheet("images/pacman/pacman_down.jpg", 56, 56);
+        Animation downAnimation = new Animation(pacmanDownSpriteSheet, 100);
+
+        SpriteSheet pacmanStillSpriteSheet = new SpriteSheet("images/pacman/pacman_still.jpg", 56, 56);
+        Animation stillAnimation = new Animation(pacmanStillSpriteSheet, 100);
+
+        this.pacmanAnimations.put(Directions.UP, upAnimation);
+        this.pacmanAnimations.put(Directions.DOWN, downAnimation);
+        this.pacmanAnimations.put(Directions.LEFT, leftAnimation);
+        this.pacmanAnimations.put(Directions.RIGHT, rightAnimation);
+        this.pacmanAnimations.put(Directions.STILL, stillAnimation);
     }
 
 
@@ -128,6 +149,7 @@ public class Pacman {
         this.closestNonCollisionX = closestNonCollisionX;
         this.closestNonCollisionY = closestNonCollisionY;
         this.pacmanAnimations.values().forEach(animation -> animation.update(delta));
+        this.arvindAnimation.update(delta);
         this.updatePacmanCirclePosition();
         this.setIsAtIntersectionAndCollidingWithWall();
         updatePosition();
@@ -141,6 +163,8 @@ public class Pacman {
 
             // dir remain unchanged if at intersection, nextDir unmovable and dir movable.
         }
+
+        this.setCurrentSpeed();
     }
 
 
@@ -150,7 +174,12 @@ public class Pacman {
      * @param g Graphics
      */
     public void render(Graphics g) {
-        this.pacmanAnimations.get(this.dir).draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
+        if (this.shouldShowArvind) {
+            this.arvindAnimation.draw(this.x, this.y, this.elementPixelUnit, this.elementPixelUnit);
+        }
+        else {
+            this.pacmanAnimations.get(this.dir).draw(this.x, this.y, this.elementPixelUnit, this.elementPixelUnit);
+        }
         if (isDebug) {
             g.draw(this.pacmanCircle);
         }
@@ -198,8 +227,8 @@ public class Pacman {
         // if the ghost is close enough to a nearest non collision location (path center) and the pacman temp circle
         // (placed at the nearest path center) has more than 2 available directions
         // (more than current direction and its reverse), it is also at intersection.
-        if (Math.abs(this.closestNonCollisionX - this.x) < stepSize / 2 &&
-                Math.abs(this.closestNonCollisionY - this.y) < stepSize / 2 &&
+        if (Math.abs(this.closestNonCollisionX - this.x) < this.speed / 2 &&
+                Math.abs(this.closestNonCollisionY - this.y) < this.speed / 2 &&
                 this.getAvailableDirections(this.closestNonCollisionX, this.closestNonCollisionY).size() >= 2) {
             this.isAtIntersection = true;
             return;
@@ -223,8 +252,8 @@ public class Pacman {
      */
     public void updatePosition() {
         if (dir != Directions.STILL) {
-            x += dirMapX.get(dir) * stepSize;
-            y += dirMapY.get(dir) * stepSize;
+            x += dirMapX.get(dir) * this.speed;
+            y += dirMapY.get(dir) * this.speed;
         }
     }
 
@@ -236,6 +265,7 @@ public class Pacman {
         this.y = this.initialY;
         this.dir = Directions.STILL;
         this.nextDir = Directions.STILL;
+        this.shouldShowArvind = false;
     }
 
 
@@ -344,7 +374,7 @@ public class Pacman {
      * @return Direction map for x coordinate
      */
     public HashMap<Directions, Integer> getDirMapX() {
-        return dirMapX;
+        return this.dirMapX;
     }
 
 
@@ -354,9 +384,24 @@ public class Pacman {
      * @return boolean isAtIntersection
      */
     public boolean getIsAtIntersection() {
-        return isAtIntersection;
+        return this.isAtIntersection;
     }
 
+    /**
+     * Getter for boolean shouldShowArvind.
+     *
+     * @return boolean shouldShowArvind
+     */
+    public boolean getShouldShowArvind() {
+        return this.shouldShowArvind;
+    }
+
+    /**
+     * Toggle the boolean field for showing Arwind animation as easter egg
+     */
+    public void toggleShouldShowArvind() {
+        this.shouldShowArvind = !this.shouldShowArvind;
+    }
 
     /**
      * Initialize direction map, which maps different directions with their corresponding moves in x and y coordinate.

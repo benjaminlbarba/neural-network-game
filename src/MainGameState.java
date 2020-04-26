@@ -25,7 +25,7 @@ public class MainGameState extends BasicGameState {
 	private float mapWindowRatio = (float) 0.7;
 
 	private GameInfo gameInfo;
-	private HashMap<Integer, Directions> keyMap;
+	private HashMap<Integer, Directions> keyMap = new HashMap<>();
 	
 	private MapData mapData;
 	
@@ -44,49 +44,11 @@ public class MainGameState extends BasicGameState {
 		this.setupMapGhostsPacmanObjects(false);
 	}
 
-	private void setupMapGhostsPacmanObjects(boolean isLevelUp) {
-		this.pickMapDataFromCollection();
-		this.elementPixelUnit = this.getElementPixelUnit(
-				mapData.mapArray[0].length,
-				mapData.mapArray.length,
-				gameWindowWidth,
-				gameWindowHeight);
-
-		this.map = new Map(mapData, elementPixelUnit, this.getMapOriginX(), this.getMapOriginY(), isDebug);
-
-		RowColTuple[] ghostsOnMap = this.mapData.ghostRowColTuples;
-		this.ghosts = new ArrayList<>();
-		for (int i = 0; i < ghostsOnMap.length; i++) {
-			this.ghosts.add(
-					new Ghost(
-							this.map.getXFromColNumber(ghostsOnMap[i].col),
-							this.map.getYFromRowNumber(ghostsOnMap[i].row),
-							this.elementPixelUnit,
-							isDebug,
-							i
-					)
-			);
-		}
-
-		this.pacman = new Pacman(
-				this.map.getXFromColNumber(this.mapData.pacmanRowColTuple.col),
-				this.map.getYFromRowNumber(this.mapData.pacmanRowColTuple.row),
-				elementPixelUnit,
-				isDebug);
-
-		if (isLevelUp) {
-			this.map.init();
-			this.pacman.init();
-			this.ghosts.forEach(ghost -> ghost.init(this.pacman.getCenterX(), this.pacman.getCenterY()));
-		}
-	}
-
 	private void initKeyMap() {
-		keyMap = new HashMap<Integer, Directions>();
-		keyMap.put(Input.KEY_LEFT, Directions.LEFT);
-		keyMap.put(Input.KEY_RIGHT, Directions.RIGHT);
-		keyMap.put(Input.KEY_UP, Directions.UP);
-		keyMap.put(Input.KEY_DOWN, Directions.DOWN);
+		this.keyMap.put(Input.KEY_LEFT, Directions.LEFT);
+		this.keyMap.put(Input.KEY_RIGHT, Directions.RIGHT);
+		this.keyMap.put(Input.KEY_UP, Directions.UP);
+		this.keyMap.put(Input.KEY_DOWN, Directions.DOWN);
 	}
 
 	private void pickMapDataFromCollection() {
@@ -128,9 +90,7 @@ public class MainGameState extends BasicGameState {
 	 */
 	@Override
 	public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) {
-		this.map.init();
-		this.pacman.init();
-		this.ghosts.forEach(ghost -> ghost.init(this.pacman.getCenterX(), this.pacman.getCenterY()));
+		this.initMapGhostsPacman();
 	}
 	
 	/**
@@ -142,10 +102,13 @@ public class MainGameState extends BasicGameState {
 		if (this.gameInfo.getLives() > 0) {
 			 stateBasedGame.enterState(GameStateManager.mainGameStateId);
 		}
+		// game over
 		else {
 			this.gameInfo.updateHighScore();
 			HistoryHighScoreState.setCurrentScore(this.gameInfo.getScore());
 			stateBasedGame.enterState(GameStateManager.gameOverStateId);
+			this.fullGameReset();
+			return;
 		}
 
 		this.manageGhostPacmanCollision();
@@ -170,7 +133,7 @@ public class MainGameState extends BasicGameState {
 					closeByWallShapes,
 					ghostClosestNonCollisionX,
 					ghostClosestNonCollisionY,
-					this.pacman.getPacmanCircle()
+					this.pacman
 			);
 		});
 		
@@ -194,9 +157,6 @@ public class MainGameState extends BasicGameState {
 		this.pacman.render(g);
 		this.ghosts.forEach(ghost -> {
 			ghost.render(g);
-			if (ghost.getIsCollidingWithPacman()) {
-				g.drawString("Pacman hits ghost: true", 50, 50);
-			}
 		});
 		this.gameInfo.render(g);
 	}
@@ -212,6 +172,11 @@ public class MainGameState extends BasicGameState {
 	 */
 	public void keyPressed(GameContainer container) {
 		Input input = container.getInput();
+
+		// toggle between pacman and Arvind animations as easter egg
+		if (input.isKeyPressed(Input.KEY_P)) {
+			this.pacman.toggleShouldShowArvind();
+		}
 
 		for (Integer key : keyMap.keySet()) {
 			if (input.isKeyPressed(key)) {
@@ -241,6 +206,52 @@ public class MainGameState extends BasicGameState {
 
 	private void levelUp() {
 		this.gameInfo.setLevel(this.gameInfo.getLevel() + 1);
+		this.setupMapGhostsPacmanObjects(true);
+	}
+
+	private void setupMapGhostsPacmanObjects(boolean isLevelUpOrFullReset) {
+		this.pickMapDataFromCollection();
+		this.elementPixelUnit = this.getElementPixelUnit(
+				mapData.mapArray[0].length,
+				mapData.mapArray.length,
+				gameWindowWidth,
+				gameWindowHeight);
+
+		this.map = new Map(mapData, elementPixelUnit, this.getMapOriginX(), this.getMapOriginY(), isDebug);
+
+		RowColTuple[] ghostsOnMap = this.mapData.ghostRowColTuples;
+		this.ghosts = new ArrayList<>();
+		for (int i = 0; i < ghostsOnMap.length; i++) {
+			this.ghosts.add(
+					new Ghost(
+							this.map.getXFromColNumber(ghostsOnMap[i].col),
+							this.map.getYFromRowNumber(ghostsOnMap[i].row),
+							this.elementPixelUnit,
+							isDebug,
+							i
+					)
+			);
+		}
+
+		this.pacman = new Pacman(
+				this.map.getXFromColNumber(this.mapData.pacmanRowColTuple.col),
+				this.map.getYFromRowNumber(this.mapData.pacmanRowColTuple.row),
+				elementPixelUnit,
+				isDebug);
+
+		if (isLevelUpOrFullReset) {
+			this.initMapGhostsPacman();
+		}
+	}
+
+	private void initMapGhostsPacman() {
+		this.map.init();
+		this.pacman.init();
+		this.ghosts.forEach(ghost -> ghost.init());
+	}
+
+	private void fullGameReset() {
+		this.gameInfo.reset();
 		this.setupMapGhostsPacmanObjects(true);
 	}
 }

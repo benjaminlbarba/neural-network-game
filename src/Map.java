@@ -32,6 +32,7 @@ public class Map {
 	private float mapOriginY;
 	
 	private MapData mapData;
+	private char[][] mapArray;
 
 	public ArrayList<Shape> getWallShapes() {
 		return wallShapes;
@@ -54,8 +55,9 @@ public class Map {
 		this.mapOriginX = mapOriginX;
 		this.mapOriginY = mapOriginY;
 
-		this.mapDataRowCount = mapData.mapArray.length;
-		this.mapDataColCount = mapData.mapArray[0].length;
+		this.cloneMapArray(this.mapData.mapArray);
+		this.mapDataRowCount = this.mapArray.length;
+		this.mapDataColCount = this.mapArray[0].length;
 	}
 	
 	/**
@@ -96,12 +98,12 @@ public class Map {
 		if (rowNum == -1 || colNum == -1) {
 			return 0;
 		}
-		if (mapData.mapArray[rowNum][colNum] == '.') {
-			mapData.mapArray[rowNum][colNum] = ' ';
+		if (this.mapArray[rowNum][colNum] == '.') {
+			this.mapArray[rowNum][colNum] = ' ';
 			return 10;
 		}
-		if (mapData.mapArray[rowNum][colNum] == '*') {
-			mapData.mapArray[rowNum][colNum] = ' ';
+		if (this.mapArray[rowNum][colNum] == '*') {
+			this.mapArray[rowNum][colNum] = ' ';
 			return 100;
 		}
 
@@ -130,7 +132,7 @@ public class Map {
 		int dotCount = 0;
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
-				if (this.mapData.mapArray[r][c] == '.') {
+				if (this.mapArray[r][c] == '.') {
 					dotCount++;
 				}
 			}
@@ -164,7 +166,7 @@ public class Map {
 	private void drawWalls() {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
-				char elementSymbol = this.mapData.mapArray[r][c];
+				char elementSymbol = this.mapArray[r][c];
 				float x = this.getXFromColNumber(c);
 				float y = this.getYFromRowNumber(r);
 				if (elementSymbol == '#') { // wall
@@ -180,7 +182,7 @@ public class Map {
 	private void createWallShapes() {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
-				char elementSymbol = this.mapData.mapArray[r][c];
+				char elementSymbol = this.mapArray[r][c];
 				float x = this.getXFromColNumber(c);
 				float y = this.getYFromRowNumber(r);
 				if (elementSymbol == '#') { // wall
@@ -194,7 +196,7 @@ public class Map {
 	private void drawDotsAndFruits() {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
-				char elementSymbol = this.mapData.mapArray[r][c];
+				char elementSymbol = this.mapArray[r][c];
 				float x = this.getXFromColNumber(c);
 				float y = this.getYFromRowNumber(r);
 				if (elementSymbol == '.') { // dots
@@ -252,5 +254,12 @@ public class Map {
 
 	public boolean isFirstRender() {
 		return isFirstRender;
+	}
+
+	private void cloneMapArray(char[][] mapArray) {
+		this.mapArray = new char[mapArray.length][];
+		for (int i = 0; i < mapArray.length; i++) {
+			this.mapArray[i] = mapArray[i].clone();
+		}
 	}
 }

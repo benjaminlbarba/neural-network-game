@@ -39,7 +39,7 @@ public class Ghost {
 	
 	private Circle ghostCircle;
 	private ArrayList<Shape> wallShapesAroundGhost;
-	private Circle pacmanCircle;
+	private Pacman pacman;
 
 	private float closestNonCollisionX;
 	private float closestNonCollisionY;
@@ -51,10 +51,6 @@ public class Ghost {
 	private float y;
 	private Directions dir;
 	private final float speed = 1.5f;
-
-	public boolean isAtIntersection() {
-		return isAtIntersection;
-	}
 
 	private boolean isAtIntersection = false;
 	private boolean isCollidingWithWall = false;
@@ -86,11 +82,7 @@ public class Ghost {
 		this.ghostStartDelay = (float) (ghostIndex * 2);
 	}
 
-	public Directions getDir() {
-		return dir;
-	}
-
-	public void init(float pacmanCenterX, float pacmanCenterY) {
+	public void init() {
 		this.dir = this.getRandomGhostDir();
 
 		this.initializeGhostAnimations();
@@ -168,7 +160,7 @@ public class Ghost {
 			ArrayList<Shape> closeByWallShapes,
 			float closestNonCollisionX,
 			float closestNonCollisionY,
-			Circle pacmanCircle
+			Pacman pacman
 	) {
 		this.ghostAnimations.values().forEach(animation -> animation.update(delta));
 
@@ -177,7 +169,7 @@ public class Ghost {
 			return;
 		}
 
-		this.pacmanCircle = pacmanCircle;
+		this.pacman = pacman;
 		this.setIsCollidingWithPacman();
 
 		this.setWallShapesAroundGhost(closeByWallShapes);
@@ -265,8 +257,8 @@ public class Ghost {
 				this.getDistanceBetweenTwoPoints(
 						ghostCircleX,
 						ghostCircleY,
-						this.pacmanCircle.getCenterX(),
-						this.pacmanCircle.getCenterY()
+						this.pacman.getCenterX(),
+						this.pacman.getCenterY()
 				) +
 				this.getDistanceBetweenTwoPoints(0, 0, this.speed, this.speed);
 		Directions chosenDirection = availableDirections.get(0);
@@ -284,8 +276,8 @@ public class Ghost {
 					newDistance = this.getDistanceBetweenTwoPoints(
 							ghostCircleX,
 							ghostCircleY - this.speed,
-							this.pacmanCircle.getCenterX(),
-							this.pacmanCircle.getCenterY()
+							this.pacman.getCenterX(),
+							this.pacman.getCenterY()
 					);
 					if (newDistance < shortestResultingDistance) {
 						shortestResultingDistance = newDistance;
@@ -301,8 +293,8 @@ public class Ghost {
 					newDistance = this.getDistanceBetweenTwoPoints(
 							ghostCircleX,
 							ghostCircleY + this.speed,
-							this.pacmanCircle.getCenterX(),
-							this.pacmanCircle.getCenterY()
+							this.pacman.getCenterX(),
+							this.pacman.getCenterY()
 					);
 					if (newDistance < shortestResultingDistance) {
 						shortestResultingDistance = newDistance;
@@ -318,8 +310,8 @@ public class Ghost {
 					newDistance = this.getDistanceBetweenTwoPoints(
 							ghostCircleX - this.speed,
 							ghostCircleY,
-							this.pacmanCircle.getCenterX(),
-							this.pacmanCircle.getCenterY()
+							this.pacman.getCenterX(),
+							this.pacman.getCenterY()
 					);
 					if (newDistance < shortestResultingDistance) {
 						shortestResultingDistance = newDistance;
@@ -336,8 +328,8 @@ public class Ghost {
 					newDistance = this.getDistanceBetweenTwoPoints(
 							ghostCircleX + this.speed,
 							ghostCircleY,
-							this.pacmanCircle.getCenterX(),
-							this.pacmanCircle.getCenterY()
+							this.pacman.getCenterX(),
+							this.pacman.getCenterY()
 					);
 					if (newDistance < shortestResultingDistance) {
 						shortestResultingDistance = newDistance;
@@ -363,13 +355,13 @@ public class Ghost {
 
 	private boolean getOnSameHorizontalPathWithPacman() {
 		boolean onSameHorizontalPathWithPacman =
-				Math.abs(this.pacmanCircle.getCenterY() - this.ghostCircle.getCenterY()) < this.elementPixelUnit / 3;
+				Math.abs(this.pacman.getCenterY() - this.ghostCircle.getCenterY()) < this.elementPixelUnit / 3;
 		return onSameHorizontalPathWithPacman;
 	}
 
 	private boolean getOnSameVerticalPathWithPacman() {
 		boolean onSameVerticalPathWithPacman =
-				Math.abs(this.pacmanCircle.getCenterX() - this.ghostCircle.getCenterX()) < this.elementPixelUnit / 3;
+				Math.abs(this.pacman.getCenterX() - this.ghostCircle.getCenterX()) < this.elementPixelUnit / 3;
 		return onSameVerticalPathWithPacman;
 	}
 
@@ -455,7 +447,9 @@ public class Ghost {
 	}
 
 	private void setIsCollidingWithPacman() {
-		this.isCollidingWithPacman = this.pacmanCircle.intersects(this.ghostCircle);
+		this.isCollidingWithPacman = this.pacman.getShouldShowArvind()
+				? false
+				: this.pacman.getPacmanCircle().intersects(this.ghostCircle);
 	}
 
 	private void setIsAtIntersectionAndCollidingWithWall() {
