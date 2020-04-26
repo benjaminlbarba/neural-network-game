@@ -83,7 +83,7 @@ public class MapCollections {
 	private static final RowColTuple[][] ghostRowColTuplesArrary = {
 			{new RowColTuple(1, 15)},
 			{new RowColTuple(1, 1)},
-			{new RowColTuple(4, 9), new RowColTuple(4, 10)},
+			{new RowColTuple(4, 5), new RowColTuple(4, 10), new RowColTuple(4, 15)},
 			{new RowColTuple(1, 6), new RowColTuple(1, 8), new RowColTuple(1, 13), new RowColTuple(5, 10)},
 	};
 	

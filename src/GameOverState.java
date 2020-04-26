@@ -8,6 +8,9 @@ import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+/**
+ * GameOverState sets up and renders the game over screen
+ */
 public class GameOverState extends BasicGameState {
     Image backgroundImage;
     Image replayButtonImage;
@@ -33,11 +36,17 @@ public class GameOverState extends BasicGameState {
         this.gameInfo = gameInfo;
     }
 
+    /**
+     * Overridden method from BasicGameState to get the state ID.
+     */
     @Override
     public int getID() {
         return GameStateManager.gameOverStateId;
     }
 
+    /**
+     * Overridden method from BasicGameState to initialize images used in this state.
+     */
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
         this.backgroundImage = new Image("images/gameOverWallpaper.jpg");
@@ -45,6 +54,9 @@ public class GameOverState extends BasicGameState {
         this.historyButtonImage = new Image("images/historyScore.png");
     }
 
+    /**
+     * Overridden method from BasicGameState to render all images and text on game over screen.
+     */
     @Override
     public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
         float imageScale =  this.getFullWindowImageScale(
@@ -84,6 +96,9 @@ public class GameOverState extends BasicGameState {
                 (float) (gameContainer.getHeight() * 0.35));
     }
 
+    /**
+     * Overridden method from BasicGameState to check if any button is clicked and perform the state switching related.
+     */
     @Override
     public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int i)
             throws SlickException {
@@ -103,6 +118,9 @@ public class GameOverState extends BasicGameState {
         }
     }
 
+    /**
+     * Calculates a proper scale between the given image and the provided window sizes to fit the image into the window
+     */
     private float getFullWindowImageScale(float windowW, float windowH, Image image) {
         float imageW = image.getWidth();
         float imageH = image.getHeight();

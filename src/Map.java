@@ -21,7 +21,6 @@ import org.newdawn.slick.geom.Shape;
 public class Map {
 	private boolean isDebug;
 
-
 	private boolean isFirstRender = true;
 
 	private int mapDataRowCount;
@@ -125,6 +124,45 @@ public class Map {
 		this.isFirstRender = false;
 	}
 	
+	public float getXFromColNumber(int columnNumber) {
+		return this.elementPixelUnit * columnNumber + this.mapOriginX;
+	}
+	
+	public float getYFromRowNumber(int rowNumber) {
+		return this.elementPixelUnit * rowNumber + this.mapOriginY;
+	}
+
+	// Get wallShapes that are within 1.5 * elementPixelUnit for both x an dy because collision could only happen
+	// with shapes nearby
+	public ArrayList<Shape> getCloseByWallShapes(float x, float y) {
+		ArrayList<Shape> closeByWallShapes = new ArrayList<>(this.wallShapes);
+		closeByWallShapes.removeIf(
+				s ->
+						(Math.abs(s.getX() - x) > 1.5 * this.elementPixelUnit) ||
+								(Math.abs(s.getY() - y) > 1.5 * this.elementPixelUnit)
+		);
+
+		return closeByWallShapes;
+	}
+
+	// This method provides x value for repositioning a character to its closest non-collision position on the map.
+	public float getClosestNonCollisionX(float currentX) {
+		int closestColNumber = this.getClosestCol(currentX);
+
+		return this.getXFromColNumber(closestColNumber);
+	}
+
+	// This method provides y value for repositioning a character to its closest non-collision position on the map.
+	public float getClosestNonCollisionY(float currentY) {
+		int closestRowNumber = this.getClosestRow(currentY);
+
+		return this.getYFromRowNumber(closestRowNumber);
+	}
+
+	public int getCurrentDotCount() {
+		return this.currentDotCount;
+	}
+
 	/**
 	 * Counts the number of dots on the map to be used for calculating score.
 	 */
@@ -139,14 +177,6 @@ public class Map {
 		}
 
 		return dotCount;
-	}
-	
-	public float getXFromColNumber(int columnNumber) {
-		return this.elementPixelUnit * columnNumber + this.mapOriginX;
-	}
-	
-	public float getYFromRowNumber(int rowNumber) {
-		return this.elementPixelUnit * rowNumber + this.mapOriginY;
 	}
 
 	private void drawWallElementRectangulars(Graphics g) {
@@ -209,51 +239,12 @@ public class Map {
 		}
 	}
 
-	// Get wallShapes that are within 1.5 * elementPixelUnit for both x an dy because collision could only happen
-	// with shapes nearby
-	public ArrayList<Shape> getCloseByWallShapes(float x, float y) {
-		ArrayList<Shape> closeByWallShapes = new ArrayList<>(this.wallShapes);
-		closeByWallShapes.removeIf(
-			s -> 
-				(Math.abs(s.getX() - x) > 1.5 * this.elementPixelUnit) || 
-				(Math.abs(s.getY() - y) > 1.5 * this.elementPixelUnit)
-		);
-
-		return closeByWallShapes;
-	}
-
-	// This method provides x value for repositioning a character to its closest non-collision position on the map.
-	public float getClosestNonCollisionX(float currentX) {
-		int closestColNumber = this.getClosestCol(currentX);
-
-		return this.getXFromColNumber(closestColNumber);
-	}
-
-	// This method provides y value for repositioning a character to its closest non-collision position on the map.
-	public float getClosestNonCollisionY(float currentY) {
-		int closestRowNumber = this.getClosestRow(currentY);
-
-		return this.getYFromRowNumber(closestRowNumber);
-	}
-
 	private int getClosestCol(float currentX) {
 		return Math.round((currentX - this.mapOriginX) / this.elementPixelUnit);
 	}
 
 	private int getClosestRow(float currentY) {
 		return Math.round((currentY - this.mapOriginY) / this.elementPixelUnit);
-	}
-	
-	public MapData getMapdata() {
-		return this.mapData;
-	}
-
-	public int getCurrentDotCount() {
-		return this.currentDotCount;
-	}
-
-	public boolean isFirstRender() {
-		return isFirstRender;
 	}
 
 	private void cloneMapArray(char[][] mapArray) {

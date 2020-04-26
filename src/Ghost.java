@@ -11,10 +11,8 @@ import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.geom.Shape;
 
 /**
- * Ghost is the class inherited from BasicCharacter class that contains all relevant 
- * fields and methods related to ghosts moving on the map. The only specification that 
- * needs to make in Ghost class against BasicCharacter class is to implement the abstract
- * method update();
+ * Ghost class contains all relevant fields and methods related to ghosts moving and nagivating on the map
+ * and killing pacman.
  */
 public class Ghost {
 	private boolean isDebug;
@@ -47,7 +45,6 @@ public class Ghost {
 	private float initialX;
 	private float initialY;
 	private float x;
-
 	private float y;
 	private Directions dir;
 	private final float speed = 1.5f;
@@ -72,16 +69,9 @@ public class Ghost {
 		this.ghostCircleRadius = (float) ((elementPixelUnit / 2) * 0.99);
 	}
 
-	private GhostColors getGhostColorFromIndex(int ghostIndex) {
-		GhostColors[] availableGhostColors = GhostColors.values();
-		return availableGhostColors[ghostIndex % (availableGhostColors.length)];
-	}
-
-	// Each ghost start one second after the last ghost
-	private void setGhostStartDelay(int ghostIndex) {
-		this.ghostStartDelay = (float) (ghostIndex * 2);
-	}
-
+	/**
+	 * Initializes the direction, ghosts animations, and the ghost circle that actually handles collision.
+	 */
 	public void init() {
 		this.dir = this.getRandomGhostDir();
 
@@ -93,6 +83,111 @@ public class Ghost {
 				this.x + this.elementPixelUnit / 2,
 				this.y + this.elementPixelUnit / 2,
 				this.ghostCircleRadius);
+	}
+	
+	/**
+	 * Update method is called every frame of the game by the governing update method in MainGameState class.
+	 * it updates the positions (x, y) and directions (dir) of the Ghost without needing to process
+	 * any keyboard input. 
+	 */
+	public void update(
+			int delta,
+			ArrayList<Shape> closeByWallShapes,
+			float closestNonCollisionX,
+			float closestNonCollisionY,
+			Pacman pacman
+	) {
+		this.ghostAnimations.values().forEach(animation -> animation.update(delta));
+
+		// Do not start moving the ghost until its time is up.
+		if (this.timer.getTime() < this.ghostStartDelay) {
+			return;
+		}
+
+		this.pacman = pacman;
+		this.setIsCollidingWithPacman();
+
+		this.setWallShapesAroundGhost(closeByWallShapes);
+		this.closestNonCollisionX = closestNonCollisionX;
+		this.closestNonCollisionY = closestNonCollisionY;
+
+		this.updateGhostCirclePosition();
+		this.setIsAtIntersectionAndCollidingWithWall();
+		this.smartMovePerFrame();
+
+		this.timer.tick();
+	}
+
+	/**
+	 * Renders the ghost animation on the screen based on it's direction. When software is in debug mode, the invisible
+	 * circle is also drawn for debug purposes.
+	 */
+	public void render(Graphics g) {
+		this.ghostAnimations.get(this.dir).draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
+		if (isDebug) {
+			g.draw(this.ghostCircle);
+		}
+	}
+
+	public boolean getIsCollidingWithPacman() {
+		return this.isCollidingWithPacman;
+	}
+
+	public void resetIsCollidingWithPacman() {
+		this.isCollidingWithPacman = false;
+	}
+
+	public float getInitialX() {
+		return initialX;
+	}
+
+	public float getInitialY() {
+		return initialY;
+	}
+
+	public float getX() {
+		return this.x;
+	}
+
+	public float getY() {
+		return this.y;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public void setY(float y) {
+		this.y = y;
+	}
+
+	public void rest() {
+		this.timer.reset();
+		this.resetIsCollidingWithPacman();
+		this.x = this.initialX;
+		this.y = this.initialY;
+		this.updateGhostCirclePosition();
+
+	}
+
+	private GhostColors getGhostColorFromIndex(int ghostIndex) {
+		GhostColors[] availableGhostColors = GhostColors.values();
+		return availableGhostColors[ghostIndex % (availableGhostColors.length)];
+	}
+
+	// Each ghost start one second after the last ghost
+	private void setGhostStartDelay(int ghostIndex) {
+		this.ghostStartDelay = (float) (ghostIndex * 2);
+	}
+	
+	/**
+	 * Ghost animations are drawn based on x, y of its top left corner while the ghost circle
+	 * needs to be positioned based on its center.
+	 * This method updates the center x,y of the circle based on the x, y of the ghost animation.
+	 */
+	private void updateGhostCirclePosition() {
+		this.ghostCircle.setCenterX(this.x + this.elementPixelUnit / 2);
+		this.ghostCircle.setCenterY(this.y + this.elementPixelUnit / 2);
 	}
 
 	private void initializeGhostAnimations() {
@@ -148,60 +243,7 @@ public class Ghost {
 
 		return "images/ghosts/" + colorString + "/" + colorString + "_" + directionString + ".png";
 	}
-	
-	/**
-	 * Implemented from the abstract method in BasicCharacter class,
-	 * update method is called every frame of the game by the governing update method in MainGameState class.
-	 * it updates the positions (x, y) and directions (dir) of the Ghost without needing to process
-	 * any keyboard input. 
-	 */
-	public void update(
-			int delta,
-			ArrayList<Shape> closeByWallShapes,
-			float closestNonCollisionX,
-			float closestNonCollisionY,
-			Pacman pacman
-	) {
-		this.ghostAnimations.values().forEach(animation -> animation.update(delta));
 
-		// Do not start moving the ghost until its time is up.
-		if (this.timer.getTime() < this.ghostStartDelay) {
-			return;
-		}
-
-		this.pacman = pacman;
-		this.setIsCollidingWithPacman();
-
-		this.setWallShapesAroundGhost(closeByWallShapes);
-		this.closestNonCollisionX = closestNonCollisionX;
-		this.closestNonCollisionY = closestNonCollisionY;
-
-		this.updateGhostCirclePosition();
-		this.setIsAtIntersectionAndCollidingWithWall();
-		this.smartMovePerFrame();
-
-		this.timer.tick();
-	}
-	
-	public void render(Graphics g) {
-		// TODO: all four inputs need to be recalculated
-		this.ghostAnimations.get(this.dir).draw(this.x, this.y, elementPixelUnit, elementPixelUnit);
-		if (isDebug) {
-			g.draw(this.ghostCircle);
-		}
-	}
-	
-	/**
-	 * Ghost animations are drawn based on x, y of its top left corner while the ghost circle
-	 * needs to be positioned based on its center.
-	 * This method updates the center x,y of the circle based on the x, y of the ghost animation.
-	 */
-	private void updateGhostCirclePosition() {
-		this.ghostCircle.setCenterX(this.x + this.elementPixelUnit / 2);
-		this.ghostCircle.setCenterY(this.y + this.elementPixelUnit / 2);
-	}
-
-	// TODO: This needs to be updated to be more intelligent
 	private void smartMovePerFrame() {
 		if (this.isAtIntersection) {
 			this.replaceGhostToPathCenter();
@@ -430,22 +472,6 @@ public class Ghost {
 		return availableDirections;
 	}
 
-	public float getX() {
-		return this.x;
-	}
-	
-	public float getY() {
-		return this.y;
-	}
-
-	public void setX(float x) {
-		this.x = x;
-	}
-
-	public void setY(float y) {
-		this.y = y;
-	}
-
 	private void setIsCollidingWithPacman() {
 		this.isCollidingWithPacman = this.pacman.getShouldShowArvind()
 				? false
@@ -478,30 +504,5 @@ public class Ghost {
 
 	private void setWallShapesAroundGhost(ArrayList<Shape> wallShapesAroundGhost) {
 		this.wallShapesAroundGhost = wallShapesAroundGhost;
-	}
-
-	public boolean getIsCollidingWithPacman() {
-		return this.isCollidingWithPacman;
-	}
-
-	public void resetIsCollidingWithPacman() {
-		this.isCollidingWithPacman = false;
-	}
-
-	public float getInitialX() {
-		return initialX;
-	}
-
-	public float getInitialY() {
-		return initialY;
-	}
-
-	public void rest() {
-		this.timer.reset();
-		this.resetIsCollidingWithPacman();
-		this.x = this.initialX;
-		this.y = this.initialY;
-		this.updateGhostCirclePosition();
-
 	}
 }

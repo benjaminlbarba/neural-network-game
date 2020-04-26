@@ -5,7 +5,6 @@ public class MapData {
 	// row and column numbers to x, y coordinate on the rendered map.
 	public RowColTuple pacmanRowColTuple;
 
-	// TODO support multiple ghosts.
 	public RowColTuple[] ghostRowColTuples;
 
 	public char[][] mapArray;

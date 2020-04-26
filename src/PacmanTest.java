@@ -14,7 +14,6 @@ class PacmanTest {
         assertEquals(pacmanTest.getDirMapX().get(Directions.LEFT), -1);
     }
 
-
     @Test
     void getIsCollidingWithCircle() {
         pacmanTest.setWallShapesAroundPacman(map.getCloseByWallShapes(pacmanTest.getX(), pacmanTest.getY()));

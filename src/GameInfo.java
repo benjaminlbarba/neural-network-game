@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import org.newdawn.slick.Graphics;
 
 /**
@@ -23,10 +22,16 @@ public class GameInfo {
 		this.reset();
 	}
 
+	/**
+	 * Adds score based on different increment amount
+	 */
 	public void addScore(int scoreAdded) {
 		this.score += scoreAdded;
 	}
-	
+
+	/**
+	 * Renders game info printed on the game screen
+	 */
 	public void render(Graphics g) {
 		g.drawString("Press 'P' to see real power", 10, 0);
 
@@ -35,30 +40,44 @@ public class GameInfo {
 		g.drawString("Remaining lives: " + this.lives, 10, 90);
 	}
 
+	/**
+	 * Getter for lives
+	 */
 	public int getLives() {
 		return this.lives;
 	}
 
+	/**
+	 * Setter for lives
+	 */
 	public void setLives(int newLives) {
 		this.lives = newLives;
 	}
 
+	/**
+	 * Getter for score
+	 */
 	public int getScore() {
 		return score;
 	}
 
-	public void setScore(int score) {
-		this.score = score;
-	}
-
+	/**
+	 * Setter for level
+	 */
 	public void setLevel(int level) {
 		this.level = level;
 	}
 
+	/**
+	 * Getter for legel
+	 */
 	public int getLevel() {
 		return this.level;
 	}
 
+	/**
+	 * Reset score, lives, level back to initial values
+	 */
 	public void reset() {
 		this.score = initialScore;
 		this.lives = initialLives;
@@ -101,5 +120,4 @@ public class GameInfo {
 		}
 		return true;
 	}
-
 }

@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.lwjgl.Sys;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.BasicGameState;
@@ -45,47 +43,6 @@ public class MainGameState extends BasicGameState {
 		this.gameWindowHeight = gameWindowHeight;
 		
 		this.setupMapGhostsPacmanObjects(false);
-	}
-
-	private void initKeyMap() {
-		this.keyMap.put(Input.KEY_LEFT, Directions.LEFT);
-		this.keyMap.put(Input.KEY_RIGHT, Directions.RIGHT);
-		this.keyMap.put(Input.KEY_UP, Directions.UP);
-		this.keyMap.put(Input.KEY_DOWN, Directions.DOWN);
-	}
-
-	private void pickMapDataFromCollection() {
-		int currentLevel = this.gameInfo.getLevel();
-
-		int availableMapCount = MapCollections.getAvailableMapCount();
-
-		if (currentLevel <= availableMapCount) {
-			this.mapData = MapCollections.getMapData(currentLevel - 1);
-		}
-		else {
-			this.mapData = MapCollections.getMapData(availableMapCount - 1);
-		}
-	}
-
-	// Fit the map fully to the window by returning the smaller convertionRatio between width and height
-	private float getElementPixelUnit(int mapRowCount, int mapColumnCount, float gameWindowWidth,
-			float gameWindowHeight) {
-		float widthConversionRatio = (float) (gameWindowWidth * 1.00 / mapColumnCount);
-		float heightConversionRatio = (float) (gameWindowHeight * 1.00 / mapRowCount);
-		// when width restricts the size of the map on the game window
-		return widthConversionRatio < heightConversionRatio 
-				? widthConversionRatio * this.mapWindowRatio 
-				: heightConversionRatio * this.mapWindowRatio;
-	}
-	
-	// Find the x for origin of the map for it to be displayed at the center of the screen using 70% of the width 
-	private float getMapOriginX() {
-		return (this.gameWindowWidth - mapData.mapArray[0].length * this.elementPixelUnit) / 2;
-	}
-	
-	// Find the y for origin of the map for it to be displayed at the center of the screen using 70% of the height 
-	private float getMapOriginY() {
-		return (this.gameWindowHeight - mapData.mapArray.length * this.elementPixelUnit) / 2;
 	}
 
 	/**
@@ -194,6 +151,47 @@ public class MainGameState extends BasicGameState {
 				this.pacman.setNextDirection(keyMap.get(key));
 			}
 		}
+	}
+
+	private void initKeyMap() {
+		this.keyMap.put(Input.KEY_LEFT, Directions.LEFT);
+		this.keyMap.put(Input.KEY_RIGHT, Directions.RIGHT);
+		this.keyMap.put(Input.KEY_UP, Directions.UP);
+		this.keyMap.put(Input.KEY_DOWN, Directions.DOWN);
+	}
+
+	private void pickMapDataFromCollection() {
+		int currentLevel = this.gameInfo.getLevel();
+
+		int availableMapCount = MapCollections.getAvailableMapCount();
+
+		if (currentLevel <= availableMapCount) {
+			this.mapData = MapCollections.getMapData(currentLevel - 1);
+		}
+		else {
+			this.mapData = MapCollections.getMapData(availableMapCount - 1);
+		}
+	}
+
+	// Fit the map fully to the window by returning the smaller convertionRatio between width and height
+	private float getElementPixelUnit(int mapRowCount, int mapColumnCount, float gameWindowWidth,
+									  float gameWindowHeight) {
+		float widthConversionRatio = (float) (gameWindowWidth * 1.00 / mapColumnCount);
+		float heightConversionRatio = (float) (gameWindowHeight * 1.00 / mapRowCount);
+		// when width restricts the size of the map on the game window
+		return widthConversionRatio < heightConversionRatio
+				? widthConversionRatio * this.mapWindowRatio
+				: heightConversionRatio * this.mapWindowRatio;
+	}
+
+	// Find the x for origin of the map for it to be displayed at the center of the screen using 70% of the width
+	private float getMapOriginX() {
+		return (this.gameWindowWidth - mapData.mapArray[0].length * this.elementPixelUnit) / 2;
+	}
+
+	// Find the y for origin of the map for it to be displayed at the center of the screen using 70% of the height
+	private float getMapOriginY() {
+		return (this.gameWindowHeight - mapData.mapArray.length * this.elementPixelUnit) / 2;
 	}
 
 	private void manageGhostPacmanCollision() {

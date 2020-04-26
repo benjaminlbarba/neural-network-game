@@ -4,15 +4,11 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.geom.Shape;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Pacman is the class inherited from BasicCharacter class that contains all relevant
- * fields and methods related to the pacman moving on the map. The only specification that
- * needs to make in Pacman class against BasicCharacter class is to implement the abstract
- * method update();
+ * Pacman contains all relevant fields and methods related to the pacman moving and navigating on the map.
  */
 public class Pacman {
     private final float normalSpeed = 1.5f;
@@ -99,10 +95,16 @@ public class Pacman {
 
     }
 
+    /**
+     * Sets up the speed based on if Arvind status is turned on
+     */
     private void setCurrentSpeed() {
         this.speed = this.shouldShowArvind ? this.arvindSpeed : this.normalSpeed;
     }
 
+    /**
+     * Initializes the animation for Arvind animation.
+     */
     private void initializeArvindAnimation() throws SlickException {
         SpriteSheet arvindSpriteSheet = new SpriteSheet("images/pacman/arvind.jpg", 200, 200);
         Animation arvindAnimation = new Animation(arvindSpriteSheet, 100);
@@ -110,6 +112,9 @@ public class Pacman {
         this.arvindAnimation = arvindAnimation;
     }
 
+    /**
+     * Initializes animations for pacman in all directions and put them into the pacmanAnimation HashMap.
+     */
     private void initializePacmanAnimations() throws SlickException {
         SpriteSheet pacmanLeftSpriteSheet = new SpriteSheet("images/pacman/pacman_left.jpg", 56, 56);
         Animation leftAnimation = new Animation(pacmanLeftSpriteSheet, 100);
@@ -160,8 +165,6 @@ public class Pacman {
             replacePacmanToPathCenter();
             nextDir = Directions.STILL;
             dir = nextDir;
-
-            // dir remain unchanged if at intersection, nextDir unmovable and dir movable.
         }
 
         this.setCurrentSpeed();
@@ -185,14 +188,18 @@ public class Pacman {
         }
     }
 
-
+    /**
+     * Sets wallShapesAroundPacman
+     */
     public void setWallShapesAroundPacman(ArrayList<Shape> wallShapesAroundPacman) {
         this.wallShapesAroundPacman = wallShapesAroundPacman;
     }
 
-    // When collision is detected, the pacman circle would already be slightly off the center of its path.
-    // This method moves it back to the center, resets its position to be right before the collision so that the
-    // collision state is clear and the pacman could change direction.
+    /**
+     * When collision is detected, the pacman circle would already be slightly off the center of its path.
+     * This method moves it back to the center, resets its position to be right before the collision so that the
+     * collision state is clear and the pacman could change direction.
+     */
     public void replacePacmanToPathCenter() {
         this.x = this.closestNonCollisionX;
         this.y = this.closestNonCollisionY;
@@ -442,7 +449,6 @@ public class Pacman {
         return !isNextPositionPacmanCircleColliding;
     }
 
-
     /**
      * This method updates the center x,y of the circle based on the x, y of the pacman animation.
      */
@@ -454,10 +460,11 @@ public class Pacman {
         this.pacmanCircle.setCenterY(centerY);
     }
 
-
-    // This method creates a temporary pacman circle that is placed one radius distance more than the
-    // current actual pacman circle for each of the four directions. Then it populates available directions for those
-    // that do not cause a collision between the temporary pacman circle and the wallShapesAroundPacman.
+    /**
+     * This method creates a temporary pacman circle that is placed one radius distance more than the
+     * current actual pacman circle for each of the four directions. Then it populates available directions for those
+     * that do not cause a collision between the temporary pacman circle and the wallShapesAroundPacman.
+     */
     private ArrayList<Directions> getAvailableDirections(float x, float y) {
         ArrayList<Directions> availableDirections = new ArrayList<>();
 
@@ -497,5 +504,4 @@ public class Pacman {
 
         return availableDirections;
     }
-
 }
