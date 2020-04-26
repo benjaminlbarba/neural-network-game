@@ -19,6 +19,11 @@ public class Ghost {
 	public Timer timer = new Timer();
 
 	private GhostColors ghostColor;
+
+	public float getGhostStartDelay() {
+		return ghostStartDelay;
+	}
+
 	// Each ghost on the map to have slightly different time to be activated to avoid movement overlapping
 	private float ghostStartDelay;
 	private HashMap<Directions, Animation> ghostAnimations = new HashMap<>();
@@ -170,13 +175,13 @@ public class Ghost {
 
 	}
 
-	private GhostColors getGhostColorFromIndex(int ghostIndex) {
+	public GhostColors getGhostColorFromIndex(int ghostIndex) {
 		GhostColors[] availableGhostColors = GhostColors.values();
 		return availableGhostColors[ghostIndex % (availableGhostColors.length)];
 	}
 
 	// Each ghost start one second after the last ghost
-	private void setGhostStartDelay(int ghostIndex) {
+	public void setGhostStartDelay(int ghostIndex) {
 		this.ghostStartDelay = (float) (ghostIndex * 2);
 	}
 	
@@ -237,7 +242,7 @@ public class Ghost {
 		return availableDirections.get(random.nextInt(availableDirections.size()));
 	}
 
-	private String getGhostSpriteFolderLink(GhostColors color, Directions direction) {
+	public String getGhostSpriteFolderLink(GhostColors color, Directions direction) {
 		String colorString = color.toString().toLowerCase();
 		String directionString = direction.toString().toLowerCase();
 
@@ -259,7 +264,7 @@ public class Ghost {
 	// When collision is detected, the ghost circle would already be slightly off the center of its path.
 	// This method moves it back to the center, resets its position to be right before the collision so that the
 	// collision state is clear and the ghost could change direction.
-	private void replaceGhostToPathCenter() {
+	public void replaceGhostToPathCenter() {
 		this.x = this.closestNonCollisionX;
 		this.y = this.closestNonCollisionY;
 	}
@@ -407,7 +412,7 @@ public class Ghost {
 		return onSameVerticalPathWithPacman;
 	}
 
-	private Directions getReverseDirection(Directions dir) {
+	public Directions getReverseDirection(Directions dir) {
 		switch (dir) {
 			case UP:
 				return Directions.DOWN;

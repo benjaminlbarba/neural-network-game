@@ -18,14 +18,14 @@ class PacmanTest {
     void getIsCollidingWithCircle() {
         pacmanTest.setWallShapesAroundPacman(map.getCloseByWallShapes(pacmanTest.getX(), pacmanTest.getY()));
         boolean res = pacmanTest.getIsCollidingWithCircle(pacmanTest.getPacmanCircle());
-        assertEquals(res, false);
+        assertFalse(res);
     }
 
     @Test
     void setIsAtIntersectionAndCollidingWithWall() {
         pacmanTest.setWallShapesAroundPacman(map.getCloseByWallShapes(pacmanTest.getX(), pacmanTest.getY()));
         pacmanTest.setIsAtIntersectionAndCollidingWithWall();
-        assertEquals(pacmanTest.getIsAtIntersection(), false);
+        assertFalse(pacmanTest.getIsAtIntersection());
     }
 
     @Test

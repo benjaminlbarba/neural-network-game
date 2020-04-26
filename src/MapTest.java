@@ -11,6 +11,29 @@ class MapTest {
     }
 
 
+    @Test
+    void getXFromColNumber() {
+        assertEquals(map.getXFromColNumber(1), 212);
+    }
+
+    @Test
+    void getYFromRowNumber() {
+        assertEquals(map.getYFromRowNumber(1), 89);
+    }
+
+
+    @Test
+    void getClosestNonCollisionX() {
+        assertEquals(map.getClosestNonCollisionX(212.1f), 212);
+    }
+
+    @Test
+    void getClosestNonCollisionY() {
+        assertEquals(map.getClosestNonCollisionX(85), 80);
+    }
+
+
+
 //	Map classUnderTest = new Map(5, 5);
 //
 //	@SuppressWarnings("deprecation")
