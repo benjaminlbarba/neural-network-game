@@ -481,7 +481,6 @@ public class Ghost {
 	}
 
 	public boolean getIsCollidingWithPacman() {
-
 		return this.isCollidingWithPacman;
 	}
 
@@ -502,5 +501,7 @@ public class Ghost {
 		this.resetIsCollidingWithPacman();
 		this.x = this.initialX;
 		this.y = this.initialY;
+		this.updateGhostCirclePosition();
+
 	}
 }

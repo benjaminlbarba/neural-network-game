@@ -27,7 +27,11 @@ public class GameOverState extends BasicGameState {
     float historyButtonX;
     float historyButtonY;
 
+    private GameInfo gameInfo;
 
+    public GameOverState(GameInfo gameInfo) {
+        this.gameInfo = gameInfo;
+    }
 
     @Override
     public int getID() {
@@ -68,10 +72,21 @@ public class GameOverState extends BasicGameState {
         this.historyButtonY = this.replayButtonY + 60;
         
         this.historyButtonImage.draw(this.historyButtonX, this.historyButtonY, this.historyButtonWidth, this.historyButtonHeight);
+
+        float scoreAndLevelX = (float) gameContainer.getWidth() / 2 - 55;
+        graphics.drawString(
+                "Your score: " + this.gameInfo.getScore(),
+                scoreAndLevelX,
+                (float) (gameContainer.getHeight() * 0.3));
+        graphics.drawString(
+                "Your level: " + this.gameInfo.getLevel(),
+                scoreAndLevelX,
+                (float) (gameContainer.getHeight() * 0.35));
     }
 
     @Override
-    public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int i) throws SlickException {
+    public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int i)
+            throws SlickException {
     	float posX = Mouse.getX();
     	float posY = this.imageHeight + 2 * this.imageY - Mouse.getY() - 16;
     	// Click history button

@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.lwjgl.Sys;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.BasicGameState;
@@ -12,6 +13,7 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 public class MainGameState extends BasicGameState {
 	private boolean isDebug;
+	private boolean shouldFullReset = false;
 
 	private int gameWindowHeight;
 	private int gameWindowWidth;
@@ -34,13 +36,14 @@ public class MainGameState extends BasicGameState {
 
 	private ArrayList<Ghost> ghosts;
 
-	public MainGameState(int gameWindowWidth, int gameWindowHeight, boolean isDebug) {
+	public MainGameState(int gameWindowWidth, int gameWindowHeight, GameInfo gameInfo,boolean isDebug) {
+		this.gameInfo = gameInfo;
 		this.isDebug = isDebug;
+
 		initKeyMap();
 		this.gameWindowWidth = gameWindowWidth;
 		this.gameWindowHeight = gameWindowHeight;
 		
-		this.gameInfo = new GameInfo();
 		this.setupMapGhostsPacmanObjects(false);
 	}
 
@@ -99,6 +102,11 @@ public class MainGameState extends BasicGameState {
 	 */
 	@Override
 	public void update(GameContainer container, StateBasedGame stateBasedGame, int delta) {
+		if (this.shouldFullReset) {
+			this.fullGameReset();
+			this.shouldFullReset = false;
+		}
+
 		if (this.gameInfo.getLives() > 0) {
 			 stateBasedGame.enterState(GameStateManager.mainGameStateId);
 		}
@@ -107,7 +115,10 @@ public class MainGameState extends BasicGameState {
 			this.gameInfo.updateHighScore();
 			HistoryHighScoreState.setCurrentScore(this.gameInfo.getScore());
 			stateBasedGame.enterState(GameStateManager.gameOverStateId);
-			this.fullGameReset();
+			// we don't want to perform full game reset right after game ends because GameOverState needs the gameInfo
+			// for displaying score and level. We perform full game reset next time this update is run (game state
+			// is turned active again).
+			this.shouldFullReset = true;
 			return;
 		}
 

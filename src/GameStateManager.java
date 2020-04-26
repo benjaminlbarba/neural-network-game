@@ -21,8 +21,11 @@ public class GameStateManager extends StateBasedGame {
 
 	@Override
 	public void initStatesList(GameContainer gameContainer) throws SlickException {
-		this.addState(new MainGameState(gameWindowWidth, gameWindowHeight, false));
-		this.addState(new GameOverState());
+		// gameInfo object will be shared between MainGateState and GameOverState
+		GameInfo gameInfo = new GameInfo();
+
+		this.addState(new MainGameState(gameWindowWidth, gameWindowHeight, gameInfo, false));
+		this.addState(new GameOverState(gameInfo));
 		this.addState(new HistoryHighScoreState());
 	}
 
@@ -32,7 +35,6 @@ public class GameStateManager extends StateBasedGame {
 	}
 
 	public static void main(String[] args) throws SlickException {
-
 		AppGameContainer appGameContainer = new AppGameContainer(new GameStateManager("Pacman"));
 
 		appGameContainer.setDisplayMode(gameWindowWidth, gameWindowHeight, false);
