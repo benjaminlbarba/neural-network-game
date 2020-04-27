@@ -10,4 +10,4 @@ For Eclipse windows, open project properties -> Java Build Path -> Libraries -> 
 
 
 ### Instruction for running
-Upon adding the library in Project Structure, the game can be run from the main method in GameStateManager class. The direction of Pacman is controlled by Up, down, left, right Arrow keys. The High Score option, when pressed, gives you a historical high score for the game.
+Upon adding the library in Project Structure, the game can be run from the main method in GameStateManager class. The direction of Pacman is controlled by Up, down, left, right Arrow keys. When the game ends there will be an option to replay the game. The High Score option, when pressed, gives you a historical high score for the game.
