@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -13,7 +15,13 @@ import org.newdawn.slick.state.StateBasedGame;
 
 public class HistoryHighScoreState extends BasicGameState {
     Image highScoreImage;
+    Image backButtonImage;
     private static int currentScore = 0;
+    
+    float backButtonWidth;
+    float backButtonHeight;
+    float backButtonX;
+    float backButtonY;
     
     @Override
     public int getID() {
@@ -23,6 +31,7 @@ public class HistoryHighScoreState extends BasicGameState {
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
     	this.highScoreImage = new Image("images/highScore.png");
+    	this.backButtonImage = new Image("images/backButton.png");
     }
 
     @Override
@@ -33,6 +42,12 @@ public class HistoryHighScoreState extends BasicGameState {
         float iconX = gameContainer.getWidth() / 2 - iconWidth / 2;
         float iconY = (float) (gameContainer.getHeight() * 0.1);
         this.highScoreImage.draw(iconX, iconY, iconWidth, iconHeight); 
+
+        this.backButtonX = iconX;
+        this.backButtonY = 480;
+        this.backButtonWidth = iconWidth;
+        this.backButtonHeight = iconScale * this.backButtonImage.getHeight();
+        this.backButtonImage.draw(backButtonX, backButtonY, backButtonWidth, backButtonHeight); 
         
         
         Path file = Paths.get("high-scores.txt");
@@ -43,7 +58,7 @@ public class HistoryHighScoreState extends BasicGameState {
 		} catch (Exception e) {
 			// do nothing...
 		}
-		int height = 300;
+		int height = 260;
 		boolean currentScorePrinted = false;
 		for (String s : lines) {
 			if (Integer.parseInt(s) == currentScore && !currentScorePrinted) {
@@ -57,6 +72,14 @@ public class HistoryHighScoreState extends BasicGameState {
 
     @Override
     public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int i) throws SlickException {
+    	float posX = Mouse.getX();
+    	float posY = gameContainer.getHeight() - Mouse.getY() - 16;
+    	// Click history button
+    	if ((posX > this.backButtonX && posX < this.backButtonX + this.backButtonWidth)
+    			&& (posY > this.backButtonY && posY < this.backButtonY + this.backButtonHeight)
+                && Mouse.isButtonDown(0)) {
+            stateBasedGame.enterState(GameStateManager.gameOverStateId);
+    	}
 
     }
     
