@@ -20,7 +20,6 @@ import org.newdawn.slick.geom.Shape;
  */
 public class Map {
 	private boolean isDebug;
-
 	private boolean isFirstRender = true;
 
 	private int mapDataRowCount;
@@ -30,9 +29,13 @@ public class Map {
 	private float mapOriginX;
 	private float mapOriginY;
 	
+	// Details of the map to render
 	private MapData mapData;
 	private char[][] mapArray;
 
+	/**
+	 * Getter for wallShape
+	 */
 	public ArrayList<Shape> getWallShapes() {
 		return wallShapes;
 	}
@@ -45,6 +48,9 @@ public class Map {
 	private Image fruitImage;
 	private Image dotImage;
 	
+	/**
+	 * Constructor
+	 */
 	public Map(MapData mapData, float elementPixelUnit, float mapOriginX, float mapOriginY, boolean isDebug) {
 		this.isDebug = isDebug;
 
@@ -124,17 +130,26 @@ public class Map {
 		this.isFirstRender = false;
 	}
 	
+	/**
+	 * The method will return the x-coordinate for a given column number.
+	 */
 	public float getXFromColNumber(int columnNumber) {
 		return this.elementPixelUnit * columnNumber + this.mapOriginX;
 	}
 	
+	/**
+	 * The method will return the y-coordinate for a given row number.
+	 */
 	public float getYFromRowNumber(int rowNumber) {
 		return this.elementPixelUnit * rowNumber + this.mapOriginY;
 	}
 
-	// Get wallShapes that are within 1.5 * elementPixelUnit for both x an dy because collision could only happen
-	// with shapes nearby
+	/**
+	 * The method can find the closet walls for a given position.
+	 */
 	public ArrayList<Shape> getCloseByWallShapes(float x, float y) {
+		// Get wallShapes that are within 1.5 * elementPixelUnit for both x an dy because collision could only happen
+		// with shapes nearby
 		ArrayList<Shape> closeByWallShapes = new ArrayList<>(this.wallShapes);
 		closeByWallShapes.removeIf(
 				s ->
@@ -145,20 +160,29 @@ public class Map {
 		return closeByWallShapes;
 	}
 
-	// This method provides x value for repositioning a character to its closest non-collision position on the map.
+	/**
+	 * This method provides x value for repositioning a character to its closest 
+	 * non-collision position on the map.
+	 */
 	public float getClosestNonCollisionX(float currentX) {
 		int closestColNumber = this.getClosestCol(currentX);
 
 		return this.getXFromColNumber(closestColNumber);
 	}
 
-	// This method provides y value for repositioning a character to its closest non-collision position on the map.
+	/**
+	 * This method provides y value for repositioning a character to its closest 
+	 * non-collision position on the map.
+	 */
 	public float getClosestNonCollisionY(float currentY) {
 		int closestRowNumber = this.getClosestRow(currentY);
 
 		return this.getYFromRowNumber(closestRowNumber);
 	}
 
+	/**
+	 * Getter for currentDotCount
+	 */
 	public int getCurrentDotCount() {
 		return this.currentDotCount;
 	}
@@ -179,6 +203,9 @@ public class Map {
 		return dotCount;
 	}
 
+	/**
+	 * Method to draw wall rectangulars in the graph.
+	 */
 	private void drawWallElementRectangulars(Graphics g) {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
@@ -193,6 +220,9 @@ public class Map {
 
 	}
 
+	/**
+	 * Method to draw walls in the graph.
+	 */
 	private void drawWalls() {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
@@ -209,6 +239,9 @@ public class Map {
 		}
 	}
 
+	/**
+	 * Method to create walls in the graph.
+	 */
 	private void createWallShapes() {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
@@ -223,6 +256,9 @@ public class Map {
 		}
 	}
 
+	/**
+	 * Draw dots and fruits in the graph.
+	 */
 	private void drawDotsAndFruits() {
 		for (int r = 0; r < this.mapDataRowCount; r++) {
 			for (int c = 0; c < this.mapDataColCount; c++) {
@@ -239,14 +275,23 @@ public class Map {
 		}
 	}
 
+	/**
+	 * Return the closet column number for a given x-coordinate
+	 */
 	private int getClosestCol(float currentX) {
 		return Math.round((currentX - this.mapOriginX) / this.elementPixelUnit);
 	}
 
+	/**
+	 * Return the closet row number for a given y-coordinate
+	 */
 	private int getClosestRow(float currentY) {
 		return Math.round((currentY - this.mapOriginY) / this.elementPixelUnit);
 	}
 
+	/**
+	 * Make a clone for the map array
+	 */
 	private void cloneMapArray(char[][] mapArray) {
 		this.mapArray = new char[mapArray.length][];
 		for (int i = 0; i < mapArray.length; i++) {
