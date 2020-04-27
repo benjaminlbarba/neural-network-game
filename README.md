@@ -1,4 +1,4 @@
-# MCIT-591 Final Project
+# MCIT-591 Final Project Team 65
 
 
 ### Instruction for installing Slick Library
