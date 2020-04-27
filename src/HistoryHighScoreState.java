@@ -40,16 +40,9 @@ public class HistoryHighScoreState extends BasicGameState {
         float iconScale = iconWidth / this.highScoreImage.getWidth();
         float iconHeight = iconScale * this.highScoreImage.getHeight();
         float iconX = gameContainer.getWidth() / 2 - iconWidth / 2;
-        float iconY = (float) (gameContainer.getHeight() * 0.1);
-        this.highScoreImage.draw(iconX, iconY, iconWidth, iconHeight); 
+        float iconY = (float) (gameContainer.getHeight() * 0.15);
+        this.highScoreImage.draw(iconX, iconY, iconWidth, iconHeight);
 
-        this.backButtonX = iconX;
-        this.backButtonY = 480;
-        this.backButtonWidth = iconWidth;
-        this.backButtonHeight = iconScale * this.backButtonImage.getHeight();
-        this.backButtonImage.draw(backButtonX, backButtonY, backButtonWidth, backButtonHeight); 
-        
-        
         Path file = Paths.get("high-scores.txt");
 		List<String> lines = Collections.emptyList();
 		try {
@@ -58,16 +51,22 @@ public class HistoryHighScoreState extends BasicGameState {
 		} catch (Exception e) {
 			// do nothing...
 		}
-		int height = 260;
+		float scoreY = (float) (iconY + (gameContainer.getHeight() * 0.4));
 		boolean currentScorePrinted = false;
 		for (String s : lines) {
 			if (Integer.parseInt(s) == currentScore && !currentScorePrinted) {
 				currentScorePrinted = true;
-				graphics.drawString("Current Score: ", gameContainer.getWidth() / 2 - 140, height);
+				graphics.drawString("Current Score: ", gameContainer.getWidth() / 2 - 140, scoreY);
 			}
-			graphics.drawString(s, gameContainer.getWidth() / 2 - 10, height);
-			height += 20;
+			graphics.drawString(s, gameContainer.getWidth() / 2 - 10, scoreY);
+            scoreY += 20;
 		}
+
+        this.backButtonX = iconX;
+        this.backButtonY = scoreY;
+        this.backButtonWidth = iconWidth;
+        this.backButtonHeight = iconScale * this.backButtonImage.getHeight();
+        this.backButtonImage.draw(backButtonX, backButtonY, backButtonWidth, backButtonHeight);
     }
 
     @Override
