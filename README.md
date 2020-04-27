@@ -37,11 +37,11 @@ within the maze as well as interactions with other classes.
 
 
 ### Instruction for installing Slick Library
-The library can be downloaded from https://slick.ninjacave.com/. \
+The library can be downloaded from https://slick.ninjacave.com/. <br />
 
-For IntelliJ IDEA windows, open project structure -> modules -> dependencies -> add JARs or directories -> choose all the files in the unzipped directory.\
+For IntelliJ IDEA windows, open project structure -> modules -> dependencies -> add JARs or directories -> choose all the files in the unzipped directory.<br />
 
-Foe Eclipse windows, open project properties -> Java Build Path -> Libraries -> add external JARS -> choose all files in the unzipped directory -> expand JRE system library -> click Native library location -> add all .dll extension in the unzipped directory -> click apply.\
+Foe Eclipse windows, open project properties -> Java Build Path -> Libraries -> add external JARS -> choose all files in the unzipped directory -> expand JRE system library -> click Native library location -> add all .dll extension in the unzipped directory -> click apply.
 
 
 ### Instruction for running
