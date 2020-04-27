@@ -1,0 +1,21 @@
+Final Project Team 65
+
+
+--------------
+Overview
+--------------
+
+In light of the Blackjack Solitaire game that we designed in project 3, our group developed a 2-dimensional Pac-Man game, in which the player controls Pac-Man, who must eat all the "dots" and avoid the "ghosts" within a enclosed maze. If Pac-Man makes contact with the ghosts, he will lose a life and the game ends if Pac-Man loses all his lives.
+
+The final 2D arcade maze game features multiple states within the structure. Each state renders a different levels when player advances through the game, as well as the gameover and high score functionalities.
+
+
+----------------
+Work Breakdown
+----------------
+
+Yufei:
+
+Liyu:
+
+Xizi(Pacman): Animation and spritesheet generation of Pacman class. Update Pacman position with corresponding keystrokes and set Pacman's path around wall shapes within the maze. Unit tests for Pacman class. 
