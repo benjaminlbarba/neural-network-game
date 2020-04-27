@@ -45,4 +45,4 @@ Foe Eclipse windows, open project properties -> Java Build Path -> Libraries -> 
 
 
 ### Instruction for running
-The project used 2D-Slick library, which can be found in the Libraries folder. Upon adding the library in Project Structure, the game can be runned from the main method in GameStateManager class. The direction of Pacman is controled by Up, down, left, right Arrow keys. The High Score option, when pressed, gives you a historical high score for the game.
+The project used 2D-Slick library, which can be found in the Libraries folder. Upon adding the library in Project Structure, the game can be run from the main method in GameStateManager class. The direction of Pacman is controlled by Up, down, left, right Arrow keys. The High Score option, when pressed, gives you a historical high score for the game.
