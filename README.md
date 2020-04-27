@@ -36,5 +36,11 @@ arrays change and move Pacman to its corresponding location, methods for drawing
 within the maze as well as interactions with other classes.
 
 
+### Instruction for installing Slick Library
+The library can be downloaded from https://slick.ninjacave.com/. 
+For IntelliJ IDEA windows, open project structure -> modules -> dependencies -> add JARs or directories -> choose all the files in the unzipped directory.
+Foe Eclipse windows, open project properties -> Java Build Path -> Libraries -> add external JARS -> choose all files in the unzipped directory -> expand JRE system library -> click Native library location -> add all .dll extension in the unzipped directory -> click apply.
+
+
 ### Instruction for running
-The project used 2D-Slick library, which can be found in the Libraries folder. Upon adding the library, the game can be runned from the main method in GameStateManager class. The direction of Pacman is controled by Up, down, left, right Arrow keys. The High Score option, when pressed, gives you a historical high score for the game.
+The project used 2D-Slick library, which can be found in the Libraries folder. Upon adding the library in Project Structure, the game can be runned from the main method in GameStateManager class. The direction of Pacman is controled by Up, down, left, right Arrow keys. The High Score option, when pressed, gives you a historical high score for the game.
