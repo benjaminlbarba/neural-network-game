@@ -275,7 +275,6 @@ public class Pacman {
         this.shouldShowArvind = false;
     }
 
-
     /**
      * Getter for x.
      *

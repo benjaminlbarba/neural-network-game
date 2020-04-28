@@ -19,11 +19,6 @@ public class Ghost {
 	public Timer timer = new Timer();
 
 	private GhostColors ghostColor;
-
-	public float getGhostStartDelay() {
-		return ghostStartDelay;
-	}
-
 	// Each ghost on the map to have slightly different time to be activated to avoid movement overlapping
 	private float ghostStartDelay;
 	private HashMap<Directions, Animation> ghostAnimations = new HashMap<>();
@@ -215,6 +210,13 @@ public class Ghost {
 	 */
 	public void setGhostStartDelay(int ghostIndex) {
 		this.ghostStartDelay = (float) (ghostIndex * 2);
+	}
+
+	/**
+	 * Getter for ghostStartDelay
+	 */
+	public float getGhostStartDelay() {
+		return this.ghostStartDelay;
 	}
 
 	/**

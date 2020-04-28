@@ -19,6 +19,11 @@ public class GameStateManager extends StateBasedGame {
 		super(title);
 	}
 
+	/**
+	 * Overridden from StateBasedGame to initialize all the states in this game into this class.
+	 * @param gameContainer required by original method but not actually used in this overridden version
+	 * @throws SlickException
+	 */
 	@Override
 	public void initStatesList(GameContainer gameContainer) throws SlickException {
 		// gameInfo object will be shared between MainGateState and GameOverState
@@ -29,11 +34,21 @@ public class GameStateManager extends StateBasedGame {
 		this.addState(new HistoryHighScoreState());
 	}
 
+	/**
+	 * Overridden from StateBaseGame to pass on the key press into mainGameState
+	 * @param key the int representation of the key pressed
+	 * @param c the character of the key pressed
+	 */
 	@Override
 	public void keyPressed(int key, char c) {
 		this.getState(mainGameStateId).keyPressed(key, c);
 	}
 
+	/**
+	 * The main method of the whole game that creates the appGameComtainer object, initializes it, and start it.
+	 * @param args
+	 * @throws SlickException
+	 */
 	public static void main(String[] args) throws SlickException {
 		AppGameContainer appGameContainer = new AppGameContainer(new GameStateManager("Pacman"));
 

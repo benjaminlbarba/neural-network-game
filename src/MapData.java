@@ -1,4 +1,6 @@
-
+/**
+ * MapData class defines the structure of each map saved in the game
+ */
 public class MapData {
 	// Row and Column number (0-indexed) on a map where pacman start position is.
 	// You can use getXFromColNumber and getYFromRowNumber in Map class to convert
