@@ -153,6 +153,9 @@ public class MainGameState extends BasicGameState {
 		}
 	}
 
+	/**
+	 * Initiate key map.
+	 */
 	private void initKeyMap() {
 		this.keyMap.put(Input.KEY_LEFT, Directions.LEFT);
 		this.keyMap.put(Input.KEY_RIGHT, Directions.RIGHT);
@@ -160,6 +163,9 @@ public class MainGameState extends BasicGameState {
 		this.keyMap.put(Input.KEY_DOWN, Directions.DOWN);
 	}
 
+	/**
+	 * Load map data from existing map collections.
+	 */
 	private void pickMapDataFromCollection() {
 		int currentLevel = this.gameInfo.getLevel();
 
@@ -173,7 +179,9 @@ public class MainGameState extends BasicGameState {
 		}
 	}
 
-	// Fit the map fully to the window by returning the smaller convertionRatio between width and height
+	/**
+	 * Fit the map fully to the window by returning the smaller convertionRatio between width and height
+	 */
 	private float getElementPixelUnit(int mapRowCount, int mapColumnCount, float gameWindowWidth,
 									  float gameWindowHeight) {
 		float widthConversionRatio = (float) (gameWindowWidth * 1.00 / mapColumnCount);
@@ -184,16 +192,23 @@ public class MainGameState extends BasicGameState {
 				: heightConversionRatio * this.mapWindowRatio;
 	}
 
-	// Find the x for origin of the map for it to be displayed at the center of the screen using 70% of the width
+	/**
+	 * Find the x for origin of the map for it to be displayed at the center of the screen using 70% of the width
+	 */
 	private float getMapOriginX() {
 		return (this.gameWindowWidth - mapData.mapArray[0].length * this.elementPixelUnit) / 2;
 	}
 
-	// Find the y for origin of the map for it to be displayed at the center of the screen using 70% of the height
+	/**
+	 * Find the y for origin of the map for it to be displayed at the center of the screen using 70% of the height
+	 */
 	private float getMapOriginY() {
 		return (this.gameWindowHeight - mapData.mapArray.length * this.elementPixelUnit) / 2;
 	}
 
+	/**
+	 * Manage the scenario where ghost run into the pacman
+	 */
 	private void manageGhostPacmanCollision() {
 		boolean isPacmanKilled = false;
 		for (Ghost ghost : this.ghosts) {
@@ -213,11 +228,17 @@ public class MainGameState extends BasicGameState {
 		}
 	}
 
+	/**
+	 * Go to the next level
+	 */
 	private void levelUp() {
 		this.gameInfo.setLevel(this.gameInfo.getLevel() + 1);
 		this.setupMapGhostsPacmanObjects(true);
 	}
 
+	/**
+	 * Initiate objects for map, ghosts and pacman
+	 */
 	private void setupMapGhostsPacmanObjects(boolean isLevelUpOrFullReset) {
 		this.pickMapDataFromCollection();
 		this.elementPixelUnit = this.getElementPixelUnit(
@@ -253,12 +274,18 @@ public class MainGameState extends BasicGameState {
 		}
 	}
 
+	/**
+	 * Initiate map, ghosts and pacman
+	 */
 	private void initMapGhostsPacman() {
 		this.map.init();
 		this.pacman.init();
 		this.ghosts.forEach(ghost -> ghost.init());
 	}
 
+	/**
+	 * Reset the entire game
+	 */
 	private void fullGameReset() {
 		this.gameInfo.reset();
 		this.setupMapGhostsPacmanObjects(true);

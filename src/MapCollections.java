@@ -89,10 +89,16 @@ public class MapCollections {
 	
 	public static final int[] targetScoreArray = {160, 500, 500, 500};
 
+	/**
+	 * Get the number of available maps
+	 */
 	public static int getAvailableMapCount() {
 		return mapsArray.length;
 	}
 
+	/**
+	 * Get the entire map data.
+	 */
 	public static MapData getMapData(int index) {
 		return new MapData(
 				pacmanRowColTupleArray[index],
