@@ -22,6 +22,6 @@ Work Breakdown
 
 Yufei:
 
-Liyu:
+Liyu: Designed & Implemented map classes, created corresponding map data. Draw maps with dots, walls and bonus fruits. Implemented score logic and update score in the game. Display and update history scores. Unit tests for Map class.
 
 Xizi(Pacman): Animation and spritesheet generation of Pacman class. Update Pacman position with corresponding keystrokes and set Pacman's path around wall shapes within the maze. Unit tests for Pacman class. 
